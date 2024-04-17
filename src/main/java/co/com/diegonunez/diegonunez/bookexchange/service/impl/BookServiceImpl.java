@@ -4,6 +4,7 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class BookServiceImpl implements IBookService {
         try{
             return bookRepository.findAll();
         }catch(Exception e){
-            throw new Exception(e.getMessage());
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 
@@ -35,9 +36,9 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public Book getBookByISBN(String ISBN) throws Exception {
+    public Book getBookByISBN(String isbn) throws Exception {
         try{
-            return bookRepository.getBookByBookISBN(ISBN);
+            return bookRepository.getBookByBookISBN(isbn);
         }catch(Exception e){
             throw new EntityNotFoundException(e.getMessage());
         }
@@ -65,14 +66,14 @@ public class BookServiceImpl implements IBookService {
         try{
             return bookRepository.save(book);
         }catch(Exception e){
-            throw new Exception(e.getMessage());
+            throw new EntityNotFoundException();
         }
     }
 
     @Override
-    public Book updateBook(String ISBN, Book bookToUpdate) throws Exception {
+    public Book updateBook(String isbn, Book bookToUpdate) throws Exception {
         try{
-            Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(ISBN));
+            Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
             if( bookIsPresent.isPresent() ){
                 Book bookOriginalInfo = bookIsPresent.get();
                 if( !bookOriginalInfo.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
@@ -120,20 +121,20 @@ public class BookServiceImpl implements IBookService {
                 throw new EntityNotFoundException();
             }
         }catch(Exception e){
-            throw new Exception(e.getMessage());
+            throw new BadRequestException();
         }
     }
     @Override
-    public String deleteBookByISBN(String ISBN) throws Exception {
+    public String deleteBookByISBN(String isbn) throws Exception {
         try{
-           Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(ISBN));
+           Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
            if(bookIsPresent.isPresent()){
-               bookRepository.deleteBookByBookISBN(ISBN);
+               bookRepository.deleteBookByBookISBN(isbn);
                return "El libro ha sido eliminado satisfactoriamente";
            }
            return "El ISBN no se encuentra registrado en el sistema";
         }catch(Exception e){
-            throw new Exception(e.getMessage());
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 }
