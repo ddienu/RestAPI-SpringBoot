@@ -14,11 +14,14 @@ import java.util.Optional;
 @Service
 public class BookServiceImpl implements IBookService {
 
+    private final IBookRepository bookRepository;
     @Autowired
-    private IBookRepository bookRepository;
+    public BookServiceImpl(IBookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     @Override
-    public List<Book> getAllBooks() throws Exception {
+    public List<Book> getAllBooks() throws EntityNotFoundException {
         try{
             return bookRepository.findAll();
         }catch(Exception e){
@@ -62,7 +65,7 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public Book createBook(Book book) throws Exception {
+    public Book createBook(Book book) throws EntityNotFoundException {
         try{
             return bookRepository.save(book);
         }catch(Exception e){
@@ -125,15 +128,19 @@ public class BookServiceImpl implements IBookService {
         }
     }
     @Override
-    public String deleteBookByISBN(String isbn) throws Exception {
+    public String deleteBookByISBN(String isbn) throws EntityNotFoundException {
         try{
-           Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
-           if(bookIsPresent.isPresent()){
+           Book book = bookRepository.getBookByBookISBN(isbn);
+           if(book != null ){
                bookRepository.deleteBookByBookISBN(isbn);
-               return "El libro ha sido eliminado satisfactoriamente";
+               return "{"
+                       + "\"status\" : \"success\"" +
+                       ", \"message\" : \"El libro ha sido eliminado satisfactoriamente\"" +
+                       "}";
+           }else{
+               throw new EntityNotFoundException("El ISBN no se encuentra registrado en el sistema");
            }
-           return "El ISBN no se encuentra registrado en el sistema";
-        }catch(Exception e){
+        }catch(EntityNotFoundException e){
             throw new EntityNotFoundException(e.getMessage());
         }
     }
