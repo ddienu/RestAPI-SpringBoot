@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class HeaderDto implements Serializable {
 
     private String status;
-    private Integer code;
+    private Integer httpCode;
     private String message;
 
 }

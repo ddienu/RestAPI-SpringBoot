@@ -7,12 +7,12 @@ import co.com.diegonunez.diegonunez.bookexchange.service.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,36 +31,54 @@ public class BookControllerImpl implements IBookController {
     public ResponseEntity<ResponseDto> getAllBooks() throws EntityNotFoundException {
         try {
             List<Book> books = bookService.getAllBooks();
+            if(!books.isEmpty()) {
+                ResponseDto responseDto = new ResponseDto(
+                        new HeaderDto("Success", HttpStatus.OK.value(), "Books founded"),
+                        new BodyResponseDto(books)
+                );
+                return new ResponseEntity<>(responseDto, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No Books founded"),
+                            new BodyResponseDto(new ArrayList<>())
+                    ),
+                    HttpStatus.OK);
 
-            BodyResponseDto bodyResponseDto = new BodyResponseDto();
-            bodyResponseDto.setBooks(books);
-
-            HeaderDto headerDto = new HeaderDto("Success", HttpStatus.OK.value(), "Books founded");
-
-            ResponseDto responseDto = new ResponseDto(headerDto, bodyResponseDto);
-
-            return new ResponseEntity<>(responseDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            BodyResponseDto bodyResponseDto = new BodyResponseDto();
-            bodyResponseDto.setBooks(null);
-
-            HeaderDto headerDto = new HeaderDto("Failed", HttpStatus.NOT_FOUND.value(), "Error listing books");
-
-            ResponseDto responseDto = new ResponseDto(headerDto, bodyResponseDto);
+            ResponseDto responseDto = new ResponseDto(
+                    new HeaderDto("Failed", HttpStatus.NOT_FOUND.value(), "Error listing books"),
+                    new BodyResponseDto());
             return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping(path = "/name/{bookName}", produces = "application/json")
     @Override
-    public ResponseEntity<List<Book>> findBooksByName(@PathVariable String bookName) throws Exception {
+    public ResponseEntity<ResponseDto> findBooksByName(@PathVariable String bookName) throws EntityNotFoundException {
         try {
-            return new ResponseEntity<>(bookService.findBooksByName(bookName), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            Book book = bookService.findBooksByName(bookName);
+            if( book != null ){
+                return new ResponseEntity<>(
+                        new ResponseDto(
+                                new HeaderDto("Success", HttpStatus.OK.value(), "Book finded"),
+                                new BodyResponseDto(book)
+                        ), HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No Book finded"),
+                            new BodyResponseDto()
+                    ), HttpStatus.OK);
+
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                    new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book"),
+                    new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
-
     @GetMapping(path = "/author/{bookAuthor}", produces = "application/json")
     @Override
     public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String bookAuthor) throws Exception {

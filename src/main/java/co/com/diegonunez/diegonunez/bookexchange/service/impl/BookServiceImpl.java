@@ -30,7 +30,7 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public List<Book> findBooksByName(String bookName) throws Exception {
+    public Book findBooksByName(String bookName) throws EntityNotFoundException {
         try{
             return bookRepository.findBookByBookName(bookName);
         }catch(Exception e){

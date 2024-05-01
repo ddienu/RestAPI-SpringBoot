@@ -6,12 +6,12 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 public interface IBookService {
-    public List<Book> getAllBooks() throws Exception;
-    List<Book> findBooksByName(String bookName) throws Exception;
-    public Book getBookByISBN(String ISBN) throws Exception;
-    public List<Book> getBooksByAuthor(String bookAuthor) throws Exception;
-    public List<Book> getBooksByGenre(String bookGenre) throws Exception;
-    public Book createBook(Book book) throws EntityNotFoundException;
-    public Book updateBook(String ISBN, Book book) throws Exception;
-    public String deleteBookByISBN(String ISBN) throws Exception;
+    List<Book> getAllBooks() throws EntityNotFoundException;
+    Book findBooksByName(String bookName) throws EntityNotFoundException;
+    Book getBookByISBN(String isbn) throws Exception;
+    List<Book> getBooksByAuthor(String bookAuthor) throws Exception;
+    List<Book> getBooksByGenre(String bookGenre) throws Exception;
+    Book createBook(Book book) throws EntityNotFoundException;
+    Book updateBook(String isbn, Book book) throws Exception;
+    String deleteBookByISBN(String isbn) throws EntityNotFoundException;
 }
