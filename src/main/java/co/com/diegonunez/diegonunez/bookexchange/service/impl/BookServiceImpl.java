@@ -15,6 +15,7 @@ import java.util.Optional;
 public class BookServiceImpl implements IBookService {
 
     private final IBookRepository bookRepository;
+
     @Autowired
     public BookServiceImpl(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -47,10 +48,10 @@ public class BookServiceImpl implements IBookService {
         }
     }
     @Override
-    public List<Book> getBooksByAuthor(String bookAuthor) throws Exception {
+    public List<Book> getBooksByAuthor(String bookAuthor) throws EntityNotFoundException {
         try{
             return bookRepository.findBooksByBookAuthor(bookAuthor);
-        }catch(Exception e){
+        }catch(EntityNotFoundException e){
             throw new EntityNotFoundException(e.getMessage());
         }
     }
@@ -65,11 +66,11 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public Book createBook(Book book) throws EntityNotFoundException {
+    public Book createBook(Book book) throws UnsupportedOperationException {
         try{
             return bookRepository.save(book);
-        }catch(Exception e){
-            throw new EntityNotFoundException();
+        }catch(UnsupportedOperationException e){
+            throw new UnsupportedOperationException();
         }
     }
 

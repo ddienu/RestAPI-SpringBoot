@@ -13,10 +13,10 @@ public interface IBookController {
 
     ResponseEntity<ResponseDto> getAllBooks() throws EntityNotFoundException;
     ResponseEntity<ResponseDto> findBooksByName(@PathVariable String bookName) throws EntityNotFoundException;
-    ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String bookAuthor) throws Exception;
+    ResponseEntity<ResponseDto> getBooksByAuthor(@PathVariable String bookAuthor) throws EntityNotFoundException;
     ResponseEntity<List<Book>> getBooksByGenre(@PathVariable String bookGenre) throws Exception;
     ResponseEntity<Book> getBookByISBN(@PathVariable String isbn) throws Exception;
-    ResponseEntity<Book> createBook(@RequestBody Book book) throws Exception;
+    ResponseEntity<ResponseDto> createBook(@RequestBody Book book) throws UnsupportedOperationException;
     ResponseEntity<Book> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws Exception;
     ResponseEntity<String> deleteBookByISBN(@PathVariable String isbn) throws Exception;
 

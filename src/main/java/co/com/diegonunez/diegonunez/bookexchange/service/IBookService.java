@@ -9,9 +9,9 @@ public interface IBookService {
     List<Book> getAllBooks() throws EntityNotFoundException;
     Book findBooksByName(String bookName) throws EntityNotFoundException;
     Book getBookByISBN(String isbn) throws Exception;
-    List<Book> getBooksByAuthor(String bookAuthor) throws Exception;
+    List<Book> getBooksByAuthor(String bookAuthor) throws EntityNotFoundException;
     List<Book> getBooksByGenre(String bookGenre) throws Exception;
-    Book createBook(Book book) throws EntityNotFoundException;
+    Book createBook(Book book) throws UnsupportedOperationException;
     Book updateBook(String isbn, Book book) throws Exception;
     String deleteBookByISBN(String isbn) throws EntityNotFoundException;
 }

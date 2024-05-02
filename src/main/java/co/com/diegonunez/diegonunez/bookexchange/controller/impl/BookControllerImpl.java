@@ -7,6 +7,7 @@ import co.com.diegonunez.diegonunez.bookexchange.service.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BookControllerImpl implements IBookController {
 
     private final BookServiceImpl bookService;
+
 
     @Autowired
     public BookControllerImpl(BookServiceImpl bookService) {
@@ -81,11 +83,29 @@ public class BookControllerImpl implements IBookController {
     }
     @GetMapping(path = "/author/{bookAuthor}", produces = "application/json")
     @Override
-    public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String bookAuthor) throws Exception {
+    public ResponseEntity<ResponseDto> getBooksByAuthor(@PathVariable String bookAuthor) throws EntityNotFoundException {
         try {
-            return new ResponseEntity<>(bookService.getBooksByAuthor(bookAuthor), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            List<Book> booksByAuthor = bookService.getBooksByAuthor(bookAuthor);
+            if( !booksByAuthor.isEmpty()){
+                return new ResponseEntity<>(
+                        new ResponseDto(
+                                new HeaderDto("Success", HttpStatus.OK.value(), "Books by author "+bookAuthor+" finded."),
+                                new BodyResponseDto(booksByAuthor)
+                        ), HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No books by author "+booksByAuthor+" finded" ),
+                            new BodyResponseDto()
+                    ), HttpStatus.OK
+            );
+
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book"),
+                            new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -111,11 +131,17 @@ public class BookControllerImpl implements IBookController {
 
     @PostMapping(produces = "application/json")
     @Override
-    public ResponseEntity<Book> createBook(@RequestBody Book book) throws Exception {
+    public ResponseEntity<ResponseDto> createBook(@Valid @RequestBody Book book) throws UnsupportedOperationException {
+        Book bookCreated = bookService.createBook(book);
         try {
-            return new ResponseEntity<>(bookService.createBook(book), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+                return new ResponseEntity<>(
+                        new ResponseDto(
+                                new HeaderDto("Success", HttpStatus.CREATED.value(), "Book created successfully"),
+                                new BodyResponseDto(bookCreated)
+                        ), HttpStatus.CREATED
+                );
+            }catch (UnsupportedOperationException e) {
+            throw new UnsupportedOperationException(e.getMessage());
         }
     }
 

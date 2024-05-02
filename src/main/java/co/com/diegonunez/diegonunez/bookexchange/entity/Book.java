@@ -1,7 +1,10 @@
 package co.com.diegonunez.diegonunez.bookexchange.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -19,8 +22,10 @@ public class Book implements Serializable {
     @Column(name = "book_isbn")
     private String bookISBN;
     @Column(name = "book_name")
+    @NotBlank(message = "The field book name cannot be empty")
     private String bookName;
     @Column(name = "book_author")
+    @NotBlank(message = "The field book author cannot be empty")
     private String bookAuthor;
     @Column(name = "is_available")
     private Boolean isAvailable;
