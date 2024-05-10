@@ -2,9 +2,9 @@ package co.com.diegonunez.diegonunez.bookexchange.controller.impl;
 
 import co.com.diegonunez.diegonunez.bookexchange.controller.IBookController;
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.BodyResponseDto;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.HeaderDto;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

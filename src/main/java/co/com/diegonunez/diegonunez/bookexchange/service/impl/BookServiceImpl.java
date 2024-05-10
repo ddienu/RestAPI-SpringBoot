@@ -75,7 +75,7 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public Book updateBook(String isbn, Book bookToUpdate) throws Exception {
+    public Book updateBook(String isbn, Book bookToUpdate) throws EntityNotFoundException, BadRequestException {
         try{
             Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
             if( bookIsPresent.isPresent() ){

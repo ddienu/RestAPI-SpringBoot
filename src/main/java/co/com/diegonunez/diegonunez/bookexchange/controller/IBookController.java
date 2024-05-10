@@ -1,7 +1,7 @@
 package co.com.diegonunez.diegonunez.bookexchange.controller;
 
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

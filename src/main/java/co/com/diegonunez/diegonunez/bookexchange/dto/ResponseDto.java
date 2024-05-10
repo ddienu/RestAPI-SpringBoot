@@ -1,4 +1,4 @@
-package co.com.diegonunez.diegonunez.bookexchange.service.dto;
+package co.com.diegonunez.diegonunez.bookexchange.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

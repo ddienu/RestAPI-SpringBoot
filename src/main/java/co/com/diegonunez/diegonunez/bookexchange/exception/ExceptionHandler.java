@@ -1,8 +1,8 @@
 package co.com.diegonunez.diegonunez.bookexchange.exception;
 
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.BodyResponseDto;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.HeaderDto;
-import co.com.diegonunez.diegonunez.bookexchange.service.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
