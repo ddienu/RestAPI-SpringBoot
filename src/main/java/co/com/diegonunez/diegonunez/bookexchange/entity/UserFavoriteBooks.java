@@ -19,7 +19,7 @@ public class UserFavoriteBooks implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "book_isbn")
     private String bookISBN;
