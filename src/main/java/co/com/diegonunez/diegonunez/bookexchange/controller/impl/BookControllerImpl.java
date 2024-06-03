@@ -7,10 +7,12 @@ import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.transaction.TransactionalException;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -167,8 +169,8 @@ public class BookControllerImpl implements IBookController {
     @PostMapping(produces = "application/json")
     @Override
     public ResponseEntity<ResponseDto> createBook(@Valid @RequestBody Book book) throws UnsupportedOperationException {
-        Book bookCreated = bookService.createBook(book);
         try {
+            Book bookCreated = bookService.createBook(book);
                 return new ResponseEntity<>(
                         new ResponseDto(
                                 new HeaderDto("Success", HttpStatus.CREATED.value(), "Book created successfully"),
@@ -178,8 +180,8 @@ public class BookControllerImpl implements IBookController {
             }catch (UnsupportedOperationException e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book by genre"),
-                            new BodyResponseDto()), HttpStatus.BAD_REQUEST);
+                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "The ISBN already exist"),
+                            null), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -213,11 +215,32 @@ public class BookControllerImpl implements IBookController {
 
     @DeleteMapping(path = "/{isbn}", produces = "application/json")
     @Override
-    public ResponseEntity<String> deleteBookByISBN(@PathVariable String isbn) throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws EntityNotFoundException {
         try {
-            return new ResponseEntity<>(bookService.deleteBookByISBN(isbn), HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(e.getMessage());
+            String bookToDelete = bookService.deleteBookByISBN(isbn);
+            if (bookToDelete.equalsIgnoreCase("Success")) {
+                return new ResponseEntity<>(new ResponseDto(
+                        new HeaderDto("Success", HttpStatus.OK.value(), "Book deleted successfully"),
+                        null
+                ), HttpStatus.OK
+                );
+            }
+        }catch(EntityNotFoundException e) {
+
+            return new ResponseEntity<>(new ResponseDto(
+                    new HeaderDto("Error", HttpStatus.NO_CONTENT.value(), "No book finded"),
+                    null
+            ), HttpStatus.OK
+            );
+
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(
+                    new ResponseDto(
+                            new HeaderDto("Error", HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error ocurred"),
+                            null)
+                    , HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
+        return new ResponseEntity<>(new ResponseDto(null, null), HttpStatus.NO_CONTENT);
     }
 }

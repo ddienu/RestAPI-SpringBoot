@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.io.Serializable;
 
@@ -20,6 +21,7 @@ public class Book implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bookId;
     @Column(name = "book_isbn")
+    @NotBlank(message = "The ISBN cannot be empty")
     private String bookISBN;
     @Column(name = "book_name")
     @NotBlank(message = "The field book name cannot be empty")

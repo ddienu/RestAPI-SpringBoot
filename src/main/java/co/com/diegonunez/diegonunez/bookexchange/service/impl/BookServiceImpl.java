@@ -4,6 +4,7 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NonUniqueResultException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class BookServiceImpl implements IBookService {
     }
 
     @Override
-    public Book getBookByISBN(String isbn) throws Exception {
+    public Book getBookByISBN(String isbn) throws RuntimeException {
         try{
             return bookRepository.getBookByBookISBN(isbn);
         }catch(Exception e){
@@ -68,7 +69,11 @@ public class BookServiceImpl implements IBookService {
     @Override
     public Book createBook(Book book) throws UnsupportedOperationException {
         try{
-            return bookRepository.save(book);
+            Book bookFinded = bookRepository.getBookByBookISBN(book.getBookISBN());
+            if( bookFinded == null){
+                return bookRepository.save(book);
+            }
+                throw new UnsupportedOperationException();
         }catch(UnsupportedOperationException e){
             throw new UnsupportedOperationException();
         }
@@ -129,20 +134,16 @@ public class BookServiceImpl implements IBookService {
         }
     }
     @Override
-    public String deleteBookByISBN(String isbn) throws EntityNotFoundException {
+    public String deleteBookByISBN(String isbn) throws RuntimeException {
         try{
            Book book = bookRepository.getBookByBookISBN(isbn);
            if(book != null ){
                bookRepository.deleteBookByBookISBN(isbn);
-               return "{"
-                       + "\"status\" : \"success\"" +
-                       ", \"message\" : \"El libro ha sido eliminado satisfactoriamente\"" +
-                       "}";
-           }else{
-               throw new EntityNotFoundException("El ISBN no se encuentra registrado en el sistema");
+               return "success";
            }
-        }catch(EntityNotFoundException e){
-            throw new EntityNotFoundException(e.getMessage());
+            throw new EntityNotFoundException();
+        }catch(RuntimeException e){
+            throw new NonUniqueResultException();
         }
     }
 }
