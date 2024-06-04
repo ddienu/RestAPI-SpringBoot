@@ -4,7 +4,6 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.NonUniqueResultException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +23,11 @@ public class BookServiceImpl implements IBookService {
 
     @Override
     public List<Book> getAllBooks() throws EntityNotFoundException {
-        try{
-            return bookRepository.findAll();
-        }catch(Exception e){
-            throw new EntityNotFoundException(e.getMessage());
-        }
+            List<Book> bookList = bookRepository.findAll();
+            if( bookList.isEmpty()){
+                throw new EntityNotFoundException();
+            }
+                return bookList;
     }
 
     @Override
@@ -68,22 +67,18 @@ public class BookServiceImpl implements IBookService {
 
     @Override
     public Book createBook(Book book) throws UnsupportedOperationException {
-        try{
-            Book bookFinded = bookRepository.getBookByBookISBN(book.getBookISBN());
-            if( bookFinded == null){
+            Book bookFound = bookRepository.getBookByBookISBN(book.getBookISBN());
+            if( bookFound == null){
                 return bookRepository.save(book);
             }
                 throw new UnsupportedOperationException();
-        }catch(UnsupportedOperationException e){
-            throw new UnsupportedOperationException();
-        }
     }
 
     @Override
     public Book updateBook(String isbn, Book bookToUpdate) throws EntityNotFoundException, BadRequestException {
         try{
             Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
-            if( bookIsPresent.isPresent() ){
+            if(bookIsPresent.isPresent()){
                 Book bookOriginalInfo = bookIsPresent.get();
                 if( !bookOriginalInfo.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
                     bookOriginalInfo.setBookAuthor(bookToUpdate.getBookAuthor());
@@ -126,24 +121,18 @@ public class BookServiceImpl implements IBookService {
                 }
                 bookRepository.save(bookOriginalInfo);
                 return bookOriginalInfo;
-            }else{
-                throw new EntityNotFoundException();
             }
+            throw new EntityNotFoundException();
         }catch(Exception e){
             throw new BadRequestException();
         }
     }
     @Override
-    public String deleteBookByISBN(String isbn) throws RuntimeException {
-        try{
+    public void deleteBookByISBN(String isbn) throws EntityNotFoundException {
            Book book = bookRepository.getBookByBookISBN(isbn);
-           if(book != null ){
+           if( book != null ){
                bookRepository.deleteBookByBookISBN(isbn);
-               return "success";
            }
-            throw new EntityNotFoundException();
-        }catch(RuntimeException e){
-            throw new NonUniqueResultException();
-        }
+           throw new EntityNotFoundException();
     }
 }

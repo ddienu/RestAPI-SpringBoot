@@ -1,6 +1,5 @@
 package co.com.diegonunez.diegonunez.bookexchange.exception;
 
-import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public class ExceptionHandler {
         return new ResponseEntity<>(
                 new ResponseDto(
                         new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), errors.toString()),
-                        new BodyResponseDto()
+                        null
                 ), HttpStatus.BAD_REQUEST
         );
     }

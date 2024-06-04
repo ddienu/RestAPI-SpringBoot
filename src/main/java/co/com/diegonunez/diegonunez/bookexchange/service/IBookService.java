@@ -13,5 +13,5 @@ public interface IBookService {
     List<Book> getBooksByGenre(String bookGenre) throws Exception;
     Book createBook(Book book) throws UnsupportedOperationException;
     Book updateBook(String isbn, Book book) throws Exception;
-    String deleteBookByISBN(String isbn) throws EntityNotFoundException;
+    void deleteBookByISBN(String isbn) throws EntityNotFoundException;
 }

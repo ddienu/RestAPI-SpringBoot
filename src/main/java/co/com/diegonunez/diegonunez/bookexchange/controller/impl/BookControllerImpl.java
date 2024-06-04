@@ -7,17 +7,18 @@ import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.NonUniqueResultException;
 import jakarta.transaction.TransactionalException;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.SUCCESS;
+import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.ERROR;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -35,25 +36,18 @@ public class BookControllerImpl implements IBookController {
     public ResponseEntity<ResponseDto> getAllBooks() throws EntityNotFoundException {
         try {
             List<Book> books = bookService.getAllBooks();
-            if(!books.isEmpty()) {
-                ResponseDto responseDto = new ResponseDto(
-                        new HeaderDto("Success", HttpStatus.OK.value(), "Books founded"),
-                        new BodyResponseDto(books)
-                );
-                return new ResponseEntity<>(responseDto, HttpStatus.OK);
-            }
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No Books founded"),
-                            null
-                    ),
-                    HttpStatus.OK);
-
+                            new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books founded"),
+                            new BodyResponseDto(books)
+                    ), HttpStatus.OK
+            );
         } catch (EntityNotFoundException e) {
-            ResponseDto responseDto = new ResponseDto(
-                    new HeaderDto("Failed", HttpStatus.NOT_FOUND.value(), "Error listing books"),
-                    new BodyResponseDto());
-            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseDto(
+                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), "No books founded"),
+                    null),
+                    HttpStatus.OK
+            );
         }
     }
 
@@ -65,21 +59,21 @@ public class BookControllerImpl implements IBookController {
             if( book != null ){
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.OK.value(), "Book with name "+bookName+" founded"),
+                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book with name "+bookName+" founded"),
                                 new BodyResponseDto(book)
                         ), HttpStatus.OK);
             }
 
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No book with name "+bookName+" founded"),
+                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), "No book with name "+bookName+" founded"),
                             null
                     ), HttpStatus.OK);
 
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                    new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book"),
+                    new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "Error finding book"),
                     new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -91,14 +85,14 @@ public class BookControllerImpl implements IBookController {
             if( !booksByAuthor.isEmpty()){
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.OK.value(), "Books by author "+bookAuthor+" founded."),
+                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books by author "+bookAuthor+" founded."),
                                 new BodyResponseDto(booksByAuthor)
                         ), HttpStatus.OK);
             }
 
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "No books by author "+bookAuthor+" founded" ),
+                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), "No books by author "+bookAuthor+" founded" ),
                             null
                     ), HttpStatus.OK
             );
@@ -106,7 +100,7 @@ public class BookControllerImpl implements IBookController {
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book"),
+                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "Error finding book"),
                             new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -119,21 +113,21 @@ public class BookControllerImpl implements IBookController {
             if( !booksByGenre.isEmpty()){
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.OK.value(), "Books by genre "+bookGenre+" founded"),
+                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books by genre "+bookGenre+" founded"),
                                 new BodyResponseDto(booksByGenre)
                         ), HttpStatus.OK
                 );
             }
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "Books by genre "+bookGenre+" not founded"),
+                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), "Books by genre "+bookGenre+" not founded"),
                             null
                     ), HttpStatus.OK
             );
         } catch (Exception e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book by genre"),
+                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "Error finding book by genre"),
                             new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -146,14 +140,14 @@ public class BookControllerImpl implements IBookController {
             if( bookByISBN != null){
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.OK.value(), "Book with ISBN:"+isbn+", founded"),
+                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book with ISBN:"+isbn+", founded"),
                                 new BodyResponseDto(bookByISBN)
                         ), HttpStatus.OK
                 );
             }
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "Book with ISBN:"+isbn+", not founded"),
+                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), "Book with ISBN:"+isbn+", not founded"),
                             null
                     ), HttpStatus.OK
             );
@@ -161,7 +155,7 @@ public class BookControllerImpl implements IBookController {
         } catch (Exception e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error finding book by ISBN"),
+                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "Error finding book by ISBN"),
                             new BodyResponseDto()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -173,14 +167,14 @@ public class BookControllerImpl implements IBookController {
             Book bookCreated = bookService.createBook(book);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.CREATED.value(), "Book created successfully"),
+                                new HeaderDto(SUCCESS, HttpStatus.CREATED.value(), "Book created successfully"),
                                 new BodyResponseDto(bookCreated)
                         ), HttpStatus.CREATED
                 );
             }catch (UnsupportedOperationException e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "The ISBN already exist"),
+                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "The ISBN already exist"),
                             null), HttpStatus.BAD_REQUEST);
         }
     }
@@ -193,7 +187,7 @@ public class BookControllerImpl implements IBookController {
             if( bookUpdated != null){
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto("Success", HttpStatus.OK.value(), "Book updated successfully"),
+                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book updated successfully"),
                                 new BodyResponseDto(bookUpdated)
                         ), HttpStatus.OK
                 );
@@ -201,14 +195,14 @@ public class BookControllerImpl implements IBookController {
 
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Success", HttpStatus.NO_CONTENT.value(), "Failed to updated book"),
+                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), "Failed to updated book"),
                             null
                     ), HttpStatus.OK
             );
         } catch (Exception e) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), "Error updating book"),
+                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), "Error updating book"),
                             null), HttpStatus.BAD_REQUEST);
         }
     }
@@ -217,30 +211,18 @@ public class BookControllerImpl implements IBookController {
     @Override
     public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws EntityNotFoundException {
         try {
-            String bookToDelete = bookService.deleteBookByISBN(isbn);
-            if (bookToDelete.equalsIgnoreCase("Success")) {
+            bookService.deleteBookByISBN(isbn);
                 return new ResponseEntity<>(new ResponseDto(
-                        new HeaderDto("Success", HttpStatus.OK.value(), "Book deleted successfully"),
+                        new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book deleted successfully"),
                         null
                 ), HttpStatus.OK
                 );
-            }
         }catch(EntityNotFoundException e) {
-
             return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto("Error", HttpStatus.NO_CONTENT.value(), "No book finded"),
+                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), "No book found"),
                     null
             ), HttpStatus.OK
             );
-
-        }catch (RuntimeException e) {
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto("Error", HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error ocurred"),
-                            null)
-                    , HttpStatus.INTERNAL_SERVER_ERROR
-            );
         }
-        return new ResponseEntity<>(new ResponseDto(null, null), HttpStatus.NO_CONTENT);
     }
 }
