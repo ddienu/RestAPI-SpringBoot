@@ -19,7 +19,7 @@ public interface IBookController {
     ResponseEntity<ResponseDto> getBooksByGenre(@PathVariable String bookGenre) throws EntityNotFoundException;
     ResponseEntity<ResponseDto> getBookByISBN(@PathVariable String isbn) throws BadRequestException;
     ResponseEntity<ResponseDto> createBook(@RequestBody Book book) throws UnsupportedOperationException;
-    ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws TransactionalException;
-    ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws NonUniqueResultException;
+    ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws TransactionalException, BadRequestException;
+    ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws NonUniqueResultException, BadRequestException;
 
 }

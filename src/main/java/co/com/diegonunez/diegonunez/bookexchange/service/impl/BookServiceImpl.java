@@ -4,135 +4,131 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 @Service
 public class BookServiceImpl implements IBookService {
 
     private final IBookRepository bookRepository;
-
     @Autowired
     public BookServiceImpl(IBookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
-
     @Override
     public List<Book> getAllBooks() throws EntityNotFoundException {
             List<Book> bookList = bookRepository.findAll();
             if( bookList.isEmpty()){
-                throw new EntityNotFoundException();
+                throw new EntityNotFoundException("No books founded");
             }
                 return bookList;
     }
-
     @Override
     public Book findBooksByName(String bookName) throws EntityNotFoundException {
-        try{
-            return bookRepository.findBookByBookName(bookName);
-        }catch(Exception e){
-            throw new EntityNotFoundException();
-        }
-    }
+            Book bookByName = bookRepository.findBookByBookName(bookName);
+            if( bookByName == null){
+                throw new EntityNotFoundException("No book with name "+bookName+" founded");
+            }
 
+            return bookByName;
+    }
     @Override
-    public Book getBookByISBN(String isbn) throws RuntimeException {
-        try{
-            return bookRepository.getBookByBookISBN(isbn);
-        }catch(Exception e){
-            throw new EntityNotFoundException(e.getMessage());
-        }
+    public Book getBookByISBN(String isbn) throws EntityNotFoundException, BadRequestException {
+            validateIsbn(isbn);
+            Book bookByIsbn = bookRepository.getBookByBookISBN(isbn);
+            if( bookByIsbn == null){
+                throw new EntityNotFoundException("Book with ISBN:"+isbn+", not founded");
+            }
+            return bookByIsbn;
     }
     @Override
     public List<Book> getBooksByAuthor(String bookAuthor) throws EntityNotFoundException {
-        try{
-            return bookRepository.findBooksByBookAuthor(bookAuthor);
-        }catch(EntityNotFoundException e){
-            throw new EntityNotFoundException(e.getMessage());
-        }
-    }
 
-    @Override
-    public List<Book> getBooksByGenre(String bookGenre) throws Exception {
-        try{
-            return bookRepository.getBooksByBookGenre(bookGenre);
-        }catch(Exception e){
-            throw new EntityNotFoundException(e.getMessage());
-        }
+            List<Book> booksByAuthor = bookRepository.findBooksByBookAuthor(bookAuthor);
+            if( booksByAuthor.isEmpty()){
+                throw new EntityNotFoundException("No books by author "+bookAuthor+" founded");
+            }
+        return booksByAuthor;
     }
-
     @Override
-    public Book createBook(Book book) throws UnsupportedOperationException {
+    public List<Book> getBooksByGenre(String bookGenre) throws EntityNotFoundException {
+            List<Book> booksByGenre = bookRepository.getBooksByBookGenre(bookGenre);
+            if( booksByGenre.isEmpty()){
+                throw new EntityNotFoundException("Books by genre "+bookGenre+" not founded");
+            }
+            return booksByGenre;
+    }
+    @Override
+    public Book createBook(Book book) throws DuplicateKeyException {
             Book bookFound = bookRepository.getBookByBookISBN(book.getBookISBN());
-            if( bookFound == null){
+            if( bookFound == null ){
                 return bookRepository.save(book);
             }
-                throw new UnsupportedOperationException();
+                throw new DuplicateKeyException("The ISBN already exist");
     }
-
     @Override
-    public Book updateBook(String isbn, Book bookToUpdate) throws EntityNotFoundException, BadRequestException {
-        try{
-            Optional<Book> bookIsPresent = Optional.ofNullable(bookRepository.getBookByBookISBN(isbn));
-            if(bookIsPresent.isPresent()){
-                Book bookOriginalInfo = bookIsPresent.get();
-                if( !bookOriginalInfo.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
-                    bookOriginalInfo.setBookAuthor(bookToUpdate.getBookAuthor());
+    public Book updateBook(String isbn, Book bookToUpdate) throws EntityNotFoundException {
+            Book bookExist = bookRepository.getBookByBookISBN(isbn);
+            if(bookExist != null){
+                if( !bookExist.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
+                    bookExist.setBookAuthor(bookToUpdate.getBookAuthor());
                 }
-                if( !bookOriginalInfo.getBookCondition().equalsIgnoreCase(bookToUpdate.getBookCondition()) && bookToUpdate.getBookCondition() != null){
-                    bookOriginalInfo.setBookCondition(bookToUpdate.getBookCondition());
+                if( !bookExist.getBookCondition().equalsIgnoreCase(bookToUpdate.getBookCondition()) && bookToUpdate.getBookCondition() != null){
+                    bookExist.setBookCondition(bookToUpdate.getBookCondition());
                 }
-                if( !bookOriginalInfo.getBookDescription().equalsIgnoreCase(bookToUpdate.getBookDescription()) && bookToUpdate.getBookDescription() != null){
-                    bookOriginalInfo.setBookDescription(bookToUpdate.getBookDescription());
+                if( !bookExist.getBookDescription().equalsIgnoreCase(bookToUpdate.getBookDescription()) && bookToUpdate.getBookDescription() != null){
+                    bookExist.setBookDescription(bookToUpdate.getBookDescription());
                 }
-                if( !bookOriginalInfo.getBookGenre().equalsIgnoreCase(bookToUpdate.getBookGenre()) && bookToUpdate.getBookGenre() != null){
-                    bookOriginalInfo.setBookGenre(bookToUpdate.getBookGenre());
+                if( !bookExist.getBookGenre().equalsIgnoreCase(bookToUpdate.getBookGenre()) && bookToUpdate.getBookGenre() != null){
+                    bookExist.setBookGenre(bookToUpdate.getBookGenre());
                 }
-                if( !bookOriginalInfo.getBookImage().equalsIgnoreCase(bookToUpdate.getBookImage()) && bookToUpdate.getBookImage() != null){
-                    bookOriginalInfo.setBookImage(bookToUpdate.getBookImage());
+                if( !bookExist.getBookImage().equalsIgnoreCase(bookToUpdate.getBookImage()) && bookToUpdate.getBookImage() != null){
+                    bookExist.setBookImage(bookToUpdate.getBookImage());
                 }
-                if( !bookOriginalInfo.getBookISBN().equalsIgnoreCase(bookToUpdate.getBookISBN()) && bookToUpdate.getBookISBN() != null){
-                    bookOriginalInfo.setBookISBN(bookToUpdate.getBookISBN());
+                if( !bookExist.getBookISBN().equalsIgnoreCase(bookToUpdate.getBookISBN()) && bookToUpdate.getBookISBN() != null){
+                    bookExist.setBookISBN(bookToUpdate.getBookISBN());
                 }
-                if( !bookOriginalInfo.getBookName().equalsIgnoreCase(bookToUpdate.getBookName()) && bookToUpdate.getBookName() != null){
-                    bookOriginalInfo.setBookName(bookToUpdate.getBookName());
+                if( !bookExist.getBookName().equalsIgnoreCase(bookToUpdate.getBookName()) && bookToUpdate.getBookName() != null){
+                    bookExist.setBookName(bookToUpdate.getBookName());
                 }
-                if( !bookOriginalInfo.getIsAvailable().equals(bookToUpdate.getIsAvailable()) && bookToUpdate.getIsAvailable() != null){
-                    bookOriginalInfo.setIsAvailable(bookToUpdate.getIsAvailable());
+                if( !bookExist.getIsAvailable().equals(bookToUpdate.getIsAvailable()) && bookToUpdate.getIsAvailable() != null){
+                    bookExist.setIsAvailable(bookToUpdate.getIsAvailable());
                 }
-                if( !bookOriginalInfo.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
-                    bookOriginalInfo.setBookAuthor(bookToUpdate.getBookAuthor());
+                if( !bookExist.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
+                    bookExist.setBookAuthor(bookToUpdate.getBookAuthor());
                 }
-                if( !bookOriginalInfo.getBookLanguage().equalsIgnoreCase(bookToUpdate.getBookLanguage()) && bookToUpdate.getBookLanguage() != null){
-                    bookOriginalInfo.setBookLanguage(bookToUpdate.getBookLanguage());
+                if( !bookExist.getBookLanguage().equalsIgnoreCase(bookToUpdate.getBookLanguage()) && bookToUpdate.getBookLanguage() != null){
+                    bookExist.setBookLanguage(bookToUpdate.getBookLanguage());
                 }
-                if( !bookOriginalInfo.getUserId().equalsIgnoreCase(bookToUpdate.getUserId()) && bookToUpdate.getUserId() != null){
-                    bookOriginalInfo.setUserId(bookToUpdate.getUserId());
+                if( !bookExist.getUserId().equalsIgnoreCase(bookToUpdate.getUserId()) && bookToUpdate.getUserId() != null){
+                    bookExist.setUserId(bookToUpdate.getUserId());
                 }
-                if( !bookOriginalInfo.getBookRelease().equalsIgnoreCase(bookToUpdate.getBookRelease()) && bookToUpdate.getBookRelease() != null){
-                    bookOriginalInfo.setBookRelease(bookToUpdate.getBookRelease());
+                if( !bookExist.getBookRelease().equalsIgnoreCase(bookToUpdate.getBookRelease()) && bookToUpdate.getBookRelease() != null){
+                    bookExist.setBookRelease(bookToUpdate.getBookRelease());
                 }
-                if( !bookOriginalInfo.getBookPublisher().equalsIgnoreCase(bookToUpdate.getBookPublisher()) && bookToUpdate.getBookPublisher() != null) {
-                    bookOriginalInfo.setBookPublisher(bookToUpdate.getBookPublisher());
+                if( !bookExist.getBookPublisher().equalsIgnoreCase(bookToUpdate.getBookPublisher()) && bookToUpdate.getBookPublisher() != null) {
+                    bookExist.setBookPublisher(bookToUpdate.getBookPublisher());
                 }
-                bookRepository.save(bookOriginalInfo);
-                return bookOriginalInfo;
+                return bookRepository.save(bookExist);
             }
-            throw new EntityNotFoundException();
-        }catch(Exception e){
-            throw new BadRequestException();
-        }
+            throw new EntityNotFoundException("No book founded to update with ISBN " + isbn);
     }
     @Override
-    public void deleteBookByISBN(String isbn) throws EntityNotFoundException {
+    public void deleteBookByISBN(String isbn) throws EntityNotFoundException, BadRequestException {
+           validateIsbn(isbn);
            Book book = bookRepository.getBookByBookISBN(isbn);
-           if( book != null ){
-               bookRepository.deleteBookByBookISBN(isbn);
+           if( book == null ){
+               throw new EntityNotFoundException("No book found");
            }
-           throw new EntityNotFoundException();
+           bookRepository.deleteBookByBookISBN(isbn);
+    }
+    public void validateIsbn(String isbn) throws BadRequestException {
+        if( isbn.length() != 13 && isbn.length() != 10 ){
+            throw new BadRequestException("The ISBN must contain 10 or 13 numbers");
+        }
     }
 }

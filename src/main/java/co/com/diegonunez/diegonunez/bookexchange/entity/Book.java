@@ -3,9 +3,11 @@ package co.com.diegonunez.diegonunez.bookexchange.entity;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import java.io.Serializable;
@@ -22,6 +24,7 @@ public class Book implements Serializable {
     private Integer bookId;
     @Column(name = "book_isbn")
     @NotBlank(message = "The ISBN cannot be empty")
+    @Pattern(regexp = "^(\\d{10}|\\d{13})$", message = "The ISBN must contain 10 or 13 numbers")
     private String bookISBN;
     @Column(name = "book_name")
     @NotBlank(message = "The field book name cannot be empty")
