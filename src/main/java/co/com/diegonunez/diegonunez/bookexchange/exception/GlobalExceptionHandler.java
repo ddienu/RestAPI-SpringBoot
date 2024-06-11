@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +87,12 @@ public class GlobalExceptionHandler {
                     null
             ), HttpStatus.OK
             );
+        }else if( message.contains("El usuario no ha sido registrado")){
+            return new ResponseEntity<>(new ResponseDto(
+                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
+                    null
+            ), HttpStatus.OK
+            );
         }
         return new ResponseEntity<>(
                 new ResponseDto(
@@ -135,6 +142,17 @@ public class GlobalExceptionHandler {
                 new ResponseDto(
                         new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), parts[0]),
                         null), HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ResponseDto> authenticationExceptionHandler(AuthenticationException e){
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ResponseDto(
+                new HeaderDto(ERROR, HttpStatus.UNAUTHORIZED.value(), message),
+                null
+        ), HttpStatus.OK
         );
     }
 }

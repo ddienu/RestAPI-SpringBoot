@@ -7,7 +7,6 @@ import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.TransactionalException;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

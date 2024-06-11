@@ -4,7 +4,6 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -126,6 +125,7 @@ public class BookServiceImpl implements IBookService {
            }
            bookRepository.deleteBookByBookISBN(isbn);
     }
+    @Override
     public void validateIsbn(String isbn) throws BadRequestException {
         if( isbn.length() != 13 && isbn.length() != 10 ){
             throw new BadRequestException("The ISBN must contain 10 or 13 numbers");

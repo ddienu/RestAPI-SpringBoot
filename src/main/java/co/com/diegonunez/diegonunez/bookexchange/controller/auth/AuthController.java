@@ -1,20 +1,50 @@
 package co.com.diegonunez.diegonunez.bookexchange.controller.auth;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.entity.User;
+import co.com.diegonunez.diegonunez.bookexchange.service.impl.UserServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.naming.AuthenticationException;
 
 @RestController
 @RequestMapping(path = "/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
+    private final UserServiceImpl userService;
+
+    @Autowired
+    public AuthController(UserServiceImpl userService){
+        this.userService = userService;
+    }
+
     @PostMapping( path = "/login")
-    public String login(){
-        return "Successfull request from login";
+    public ResponseEntity<ResponseDto> login(@RequestBody User user) throws AuthenticationException {
+        userService.login(user);
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        new HeaderDto("Success", HttpStatus.OK.value(), "User login successfully"),
+                        null
+                ), HttpStatus.OK
+        );
     }
 
     @PostMapping(path = "/register")
-    public String register(){
-        return "Successfull request from register";
+    public ResponseEntity<ResponseDto> register(@RequestBody User user){
+        userService.register(user);
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        new HeaderDto("Success", HttpStatus.OK.value(), "User registered succesfully"),
+                        null
+                ), HttpStatus.OK
+        );
+
     }
 }
