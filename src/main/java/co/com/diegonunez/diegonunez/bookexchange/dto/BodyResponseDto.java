@@ -1,4 +1,4 @@
-package co.com.diegonunez.diegonunez.bookexchange.service.dto;
+package co.com.diegonunez.diegonunez.bookexchange.dto;
 
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,4 +23,14 @@ public class BodyResponseDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("BookList")
     private List<Book> books;
+
+    //Constructor for books property
+    public BodyResponseDto(List<Book> books){
+        this.books = books;
+    }
+
+    //Constructor for book property
+    public BodyResponseDto(Book book){
+        this.book = book;
+    }
 }

@@ -1,4 +1,4 @@
-package co.com.diegonunez.diegonunez.bookexchange.service.dto;
+package co.com.diegonunez.diegonunez.bookexchange.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class HeaderDto implements Serializable {
 
     private String status;
-    private Integer code;
+    private Integer httpCode;
     private String message;
 
 }
