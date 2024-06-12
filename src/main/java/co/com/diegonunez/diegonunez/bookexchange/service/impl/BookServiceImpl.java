@@ -1,12 +1,12 @@
 package co.com.diegonunez.diegonunez.bookexchange.service.impl;
 
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
+import co.com.diegonunez.diegonunez.bookexchange.exception.DuplicateISBNException;
+import co.com.diegonunez.diegonunez.bookexchange.exception.InvalidISBNException;
+import co.com.diegonunez.diegonunez.bookexchange.exception.NoBookFoundException;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IBookRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
-import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,58 +19,58 @@ public class BookServiceImpl implements IBookService {
         this.bookRepository = bookRepository;
     }
     @Override
-    public List<Book> getAllBooks() throws EntityNotFoundException {
+    public List<Book> getAllBooks() throws NoBookFoundException {
             List<Book> bookList = bookRepository.findAll();
             if( bookList.isEmpty()){
-                throw new EntityNotFoundException("No books founded");
+                throw new NoBookFoundException("No books founded");
             }
                 return bookList;
     }
     @Override
-    public Book findBooksByName(String bookName) throws EntityNotFoundException {
+    public Book findBooksByName(String bookName) throws NoBookFoundException {
             Book bookByName = bookRepository.findBookByBookName(bookName);
             if( bookByName == null){
-                throw new EntityNotFoundException("No book with name "+bookName+" founded");
+                throw new NoBookFoundException("No book with name "+bookName+" founded");
             }
 
             return bookByName;
     }
     @Override
-    public Book getBookByISBN(String isbn) throws EntityNotFoundException, BadRequestException {
+    public Book getBookByISBN(String isbn) throws NoBookFoundException, InvalidISBNException {
             validateIsbn(isbn);
             Book bookByIsbn = bookRepository.getBookByBookISBN(isbn);
             if( bookByIsbn == null){
-                throw new EntityNotFoundException("Book with ISBN:"+isbn+", not founded");
+                throw new NoBookFoundException("Book with ISBN:"+isbn+", not founded");
             }
             return bookByIsbn;
     }
     @Override
-    public List<Book> getBooksByAuthor(String bookAuthor) throws EntityNotFoundException {
+    public List<Book> getBooksByAuthor(String bookAuthor) throws NoBookFoundException {
 
             List<Book> booksByAuthor = bookRepository.findBooksByBookAuthor(bookAuthor);
             if( booksByAuthor.isEmpty()){
-                throw new EntityNotFoundException("No books by author "+bookAuthor+" founded");
+                throw new NoBookFoundException("No books by author "+bookAuthor+" founded");
             }
         return booksByAuthor;
     }
     @Override
-    public List<Book> getBooksByGenre(String bookGenre) throws EntityNotFoundException {
+    public List<Book> getBooksByGenre(String bookGenre) throws NoBookFoundException {
             List<Book> booksByGenre = bookRepository.getBooksByBookGenre(bookGenre);
             if( booksByGenre.isEmpty()){
-                throw new EntityNotFoundException("Books by genre "+bookGenre+" not founded");
+                throw new NoBookFoundException("Books by genre "+bookGenre+" not founded");
             }
             return booksByGenre;
     }
     @Override
-    public Book createBook(Book book) throws DuplicateKeyException {
+    public Book createBook(Book book) throws DuplicateISBNException {
             Book bookFound = bookRepository.getBookByBookISBN(book.getBookISBN());
             if( bookFound == null ){
                 return bookRepository.save(book);
             }
-                throw new DuplicateKeyException("The ISBN already exist");
+                throw new DuplicateISBNException("The ISBN already exist");
     }
     @Override
-    public Book updateBook(String isbn, Book bookToUpdate) throws EntityNotFoundException {
+    public Book updateBook(String isbn, Book bookToUpdate) throws NoBookFoundException {
             Book bookExist = bookRepository.getBookByBookISBN(isbn);
             if(bookExist != null){
                 if( !bookExist.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
@@ -114,21 +114,21 @@ public class BookServiceImpl implements IBookService {
                 }
                 return bookRepository.save(bookExist);
             }
-            throw new EntityNotFoundException("No book founded to update with ISBN " + isbn);
+            throw new NoBookFoundException("No book founded to update with ISBN " + isbn);
     }
     @Override
-    public void deleteBookByISBN(String isbn) throws EntityNotFoundException, BadRequestException {
+    public void deleteBookByISBN(String isbn) throws NoBookFoundException, InvalidISBNException {
            validateIsbn(isbn);
            Book book = bookRepository.getBookByBookISBN(isbn);
            if( book == null ){
-               throw new EntityNotFoundException("No book found");
+               throw new NoBookFoundException("No book found");
            }
            bookRepository.deleteBookByBookISBN(isbn);
     }
     @Override
-    public void validateIsbn(String isbn) throws BadRequestException {
+    public void validateIsbn(String isbn) throws InvalidISBNException {
         if( isbn.length() != 13 && isbn.length() != 10 ){
-            throw new BadRequestException("The ISBN must contain 10 or 13 numbers");
+            throw new InvalidISBNException("The ISBN must contain 10 or 13 numbers");
         }
     }
 }

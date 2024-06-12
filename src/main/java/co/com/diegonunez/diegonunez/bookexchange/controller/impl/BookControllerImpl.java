@@ -5,12 +5,12 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.exception.DuplicateISBNException;
+import co.com.diegonunez.diegonunez.bookexchange.exception.InvalidISBNException;
+import co.com.diegonunez.diegonunez.bookexchange.exception.NoBookFoundException;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.BookServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,7 @@ public class BookControllerImpl implements IBookController {
     }
     @Override
     @GetMapping
-    public ResponseEntity<ResponseDto> getAllBooks() throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> getAllBooks() throws NoBookFoundException {
             List<Book> books = bookService.getAllBooks();
             return new ResponseEntity<>(
                     new ResponseDto(
@@ -41,7 +41,7 @@ public class BookControllerImpl implements IBookController {
     }
     @GetMapping(path = "/name/{bookName}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> findBooksByName(@PathVariable String bookName) throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> findBooksByName(@PathVariable String bookName) throws NoBookFoundException {
             Book book = bookService.findBooksByName(bookName);
                 return new ResponseEntity<>(
                         new ResponseDto(
@@ -51,7 +51,7 @@ public class BookControllerImpl implements IBookController {
             }
     @GetMapping(path = "/author/{bookAuthor}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> getBooksByAuthor(@PathVariable String bookAuthor) throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> getBooksByAuthor(@PathVariable String bookAuthor) throws NoBookFoundException {
             List<Book> booksByAuthor = bookService.getBooksByAuthor(bookAuthor);
                 return new ResponseEntity<>(
                         new ResponseDto(
@@ -61,7 +61,7 @@ public class BookControllerImpl implements IBookController {
     }
     @GetMapping(path = "/genre/{bookGenre}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> getBooksByGenre(@PathVariable String bookGenre) throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> getBooksByGenre(@PathVariable String bookGenre) throws NoBookFoundException {
             List<Book> booksByGenre = bookService.getBooksByGenre(bookGenre);
                 return new ResponseEntity<>(
                         new ResponseDto(
@@ -72,7 +72,7 @@ public class BookControllerImpl implements IBookController {
         }
     @GetMapping(path = "/isbn/{isbn}")
     @Override
-    public ResponseEntity<ResponseDto> getBookByISBN(@PathVariable String isbn) throws BadRequestException {
+    public ResponseEntity<ResponseDto> getBookByISBN(@PathVariable String isbn) throws NoBookFoundException,InvalidISBNException {
             Book bookByISBN = bookService.getBookByISBN(isbn);
                 return new ResponseEntity<>(
                         new ResponseDto(
@@ -83,7 +83,7 @@ public class BookControllerImpl implements IBookController {
             }
     @PostMapping(produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> createBook(@Valid @RequestBody Book book) throws DuplicateKeyException {
+    public ResponseEntity<ResponseDto> createBook(@Valid @RequestBody Book book) throws DuplicateISBNException {
             Book bookCreated = bookService.createBook(book);
                 return new ResponseEntity<>(
                         new ResponseDto(
@@ -94,7 +94,7 @@ public class BookControllerImpl implements IBookController {
         }
     @PutMapping(path = "/{isbn}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws EntityNotFoundException {
+    public ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws NoBookFoundException {
         Book bookUpdated = bookService.updateBook(isbn, bookToUpdate);
             return new ResponseEntity<>(
                     new ResponseDto(
@@ -105,7 +105,7 @@ public class BookControllerImpl implements IBookController {
         }
     @DeleteMapping(path = "/{isbn}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws EntityNotFoundException, BadRequestException {
+    public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws NoBookFoundException, InvalidISBNException {
             bookService.deleteBookByISBN(isbn);
                 return new ResponseEntity<>(new ResponseDto(
                         new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book deleted successfully"),

@@ -2,12 +2,10 @@ package co.com.diegonunez.diegonunez.bookexchange.exception;
 
 import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
-import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,8 +37,8 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ResponseDto> handleEntityNotFoundException(EntityNotFoundException e) {
+    @ExceptionHandler(NoBookFoundException.class)
+    public ResponseEntity<ResponseDto> noBookFoundExceptionHandler(NoBookFoundException e) {
         String message = e.getMessage();
 
         if (message.equalsIgnoreCase("No books founded")) {
@@ -87,12 +85,6 @@ public class GlobalExceptionHandler {
                     null
             ), HttpStatus.OK
             );
-        }else if( message.contains("El usuario no ha sido registrado")){
-            return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
-            );
         }
         return new ResponseEntity<>(
                 new ResponseDto(
@@ -101,8 +93,8 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ResponseDto> badRequestExceptionHandler(BadRequestException e){
+    @ExceptionHandler(InvalidISBNException.class)
+    public ResponseEntity<ResponseDto> invalidISBNExceptionHandler(InvalidISBNException e){
         String message = e.getMessage();
 
         if( message.contains("The ISBN must contain 10 or 13 numbers")){
@@ -118,8 +110,8 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<ResponseDto> duplicateKeyExceptionHandler(DuplicateKeyException e){
+    @ExceptionHandler(DuplicateISBNException.class)
+    public ResponseEntity<ResponseDto> duplicateKeyExceptionHandler(DuplicateISBNException e){
         String message = e.getMessage();
 
         if(message.contains("The ISBN already exist")){
@@ -151,6 +143,17 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new ResponseDto(
                 new HeaderDto(ERROR, HttpStatus.UNAUTHORIZED.value(), message),
+                null
+        ), HttpStatus.OK
+        );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ResponseDto> usernameNotFoundExceptionHandler(UsernameNotFoundException e){
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ResponseDto(
+                new HeaderDto(ERROR, HttpStatus.NOT_FOUND.value(), message),
                 null
         ), HttpStatus.OK
         );

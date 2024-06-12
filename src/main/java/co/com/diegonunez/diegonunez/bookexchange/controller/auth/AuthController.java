@@ -1,13 +1,12 @@
 package co.com.diegonunez.diegonunez.bookexchange.controller.auth;
 
-import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.UserDto;
 import co.com.diegonunez.diegonunez.bookexchange.entity.User;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping( path = "/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody User user) throws AuthenticationException {
+    public ResponseEntity<ResponseDto> login(@RequestBody UserDto user) throws AuthenticationException {
         userService.login(user);
         return new ResponseEntity<>(
                 new ResponseDto(

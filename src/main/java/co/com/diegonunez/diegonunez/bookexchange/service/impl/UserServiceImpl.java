@@ -1,10 +1,11 @@
 package co.com.diegonunez.diegonunez.bookexchange.service.impl;
 
+import co.com.diegonunez.diegonunez.bookexchange.dto.UserDto;
 import co.com.diegonunez.diegonunez.bookexchange.entity.User;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IUserRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IUserService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +23,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User login(User user) throws AuthenticationException {
+    public User login(UserDto user) throws AuthenticationException {
         User userFound = userRepository.getUserByEmail(user.getEmail());
         if( userFound == null){
-            throw new EntityNotFoundException("El usuario no ha sido registrado");
+            throw new UsernameNotFoundException("User not found");
         }
         String passwordEncrypted = userFound.getPassword();
 
