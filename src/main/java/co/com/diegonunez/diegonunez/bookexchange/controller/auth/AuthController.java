@@ -1,5 +1,6 @@
 package co.com.diegonunez.diegonunez.bookexchange.controller.auth;
 
+import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.UserDto;
@@ -30,7 +31,7 @@ public class AuthController {
         return new ResponseEntity<>(
                 new ResponseDto(
                         new HeaderDto("Success", HttpStatus.OK.value(), "User login successfully"),
-                        null
+                        new BodyResponseDto(userService.login(user))
                 ), HttpStatus.OK
         );
     }

@@ -23,6 +23,9 @@ public class BodyResponseDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("BookList")
     private List<Book> books;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("token")
+    private String token;
 
     //Constructor for books property
     public BodyResponseDto(List<Book> books){
@@ -32,5 +35,9 @@ public class BodyResponseDto implements Serializable {
     //Constructor for book property
     public BodyResponseDto(Book book){
         this.book = book;
+    }
+
+    public BodyResponseDto(String token) {
+        this.token = token;
     }
 }

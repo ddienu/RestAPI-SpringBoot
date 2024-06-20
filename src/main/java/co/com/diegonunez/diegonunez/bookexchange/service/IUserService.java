@@ -6,6 +6,6 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.User;
 import javax.naming.AuthenticationException;
 
 public interface IUserService {
-    User login(UserDto user) throws AuthenticationException;
+    String login(UserDto user) throws AuthenticationException;
     User register(User user);
 }
