@@ -27,11 +27,11 @@ public class AuthController {
 
     @PostMapping( path = "/login")
     public ResponseEntity<ResponseDto> login(@RequestBody UserDto user) throws AuthenticationException {
-        userService.login(user);
+        String serviceResponse = userService.login(user);
         return new ResponseEntity<>(
                 new ResponseDto(
                         new HeaderDto("Success", HttpStatus.OK.value(), "User login successfully"),
-                        new BodyResponseDto(userService.login(user))
+                        new BodyResponseDto(serviceResponse)
                 ), HttpStatus.OK
         );
     }
