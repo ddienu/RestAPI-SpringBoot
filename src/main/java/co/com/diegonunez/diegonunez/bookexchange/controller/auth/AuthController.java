@@ -1,7 +1,6 @@
 package co.com.diegonunez.diegonunez.bookexchange.controller.auth;
 
-import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
-import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.UserDto;
 import co.com.diegonunez.diegonunez.bookexchange.entity.User;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -27,24 +27,21 @@ public class AuthController {
 
     @PostMapping( path = "/login")
     public ResponseEntity<ResponseDto> login(@RequestBody UserDto user) throws AuthenticationException {
-        String serviceResponse = userService.login(user);
+        String token = userService.login(user);
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Success", HttpStatus.OK.value(), "User login successfully"),
-                        new BodyResponseDto(serviceResponse)
+                        new Data("User login successfully", token)
                 ), HttpStatus.OK
         );
     }
 
     @PostMapping(path = "/register")
-    public ResponseEntity<ResponseDto> register(@RequestBody User user){
+    public ResponseEntity<ResponseDto> register(@RequestBody User user) throws SQLIntegrityConstraintViolationException {
         userService.register(user);
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Success", HttpStatus.OK.value(), "User registered succesfully"),
-                        null
-                ), HttpStatus.OK
+                        new Data("User registered succesfully")
+                ), HttpStatus.CREATED
         );
-
     }
 }

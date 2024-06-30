@@ -1,7 +1,11 @@
 package co.com.diegonunez.diegonunez.bookexchange.exception;
 
-import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
+import io.jsonwebtoken.ClaimJwtException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.naming.AuthenticationException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +36,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), errors.toString()),
-                        null
+                        new Data(errors.toString())
                 ), HttpStatus.BAD_REQUEST
         );
     }
@@ -44,52 +48,47 @@ public class GlobalExceptionHandler {
         if (message.equalsIgnoreCase("No books founded")) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                            null), HttpStatus.OK
+                            new Data(e.getMessage())
+                            ), HttpStatus.NO_CONTENT
             );
         } else if (message.contains("No book with name")) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
+                            new Data(message)
+                            ), HttpStatus.NO_CONTENT);
         } else if (message.contains("Book with ISBN")) {
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message),
-                            null
-                    ), HttpStatus.OK
+                            new Data(message)
+                    ), HttpStatus.NO_CONTENT
             );
         }else if( message.contains("No books by author")){
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message ),
-                            null
-                    ), HttpStatus.OK
+                            new Data( message )
+                    ), HttpStatus.NO_CONTENT
             );
         }else if( message.contains("Books by genre")){
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message),
-                            null
-                    ), HttpStatus.OK
+                            new Data(message)
+                    ), HttpStatus.NO_CONTENT
             );
         }else if( message.contains("No book found")){
             return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
+                    new Data(message)
+            ), HttpStatus.NO_CONTENT
             );
         }else if( message.contains("No book founded to update with ISBN")){
             return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
+                    new Data(message)
+            ), HttpStatus.NO_CONTENT
             );
         }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
+                        new Data(e.getMessage())
+                        ), HttpStatus.NO_CONTENT
         );
     }
 
@@ -100,13 +99,13 @@ public class GlobalExceptionHandler {
         if( message.contains("The ISBN must contain 10 or 13 numbers")){
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
+                            new Data(message)
+                            ), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
+                        new Data(e.getMessage())
+                        ), HttpStatus.NO_CONTENT
         );
     }
 
@@ -117,13 +116,11 @@ public class GlobalExceptionHandler {
         if(message.contains("The ISBN already exist")){
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
+                            new Data(message)), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
+                        new Data(e.getMessage())), HttpStatus.NO_CONTENT
         );
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -132,8 +129,7 @@ public class GlobalExceptionHandler {
         String [] parts = message.split(":");
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), parts[0]),
-                        null), HttpStatus.BAD_REQUEST
+                        new Data(parts[0])), HttpStatus.BAD_REQUEST
         );
     }
 
@@ -142,9 +138,7 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
 
         return new ResponseEntity<>(new ResponseDto(
-                new HeaderDto(ERROR, HttpStatus.UNAUTHORIZED.value(), message),
-                null
-        ), HttpStatus.OK
+                new Data(message)), HttpStatus.UNAUTHORIZED
         );
     }
 
@@ -153,9 +147,16 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
 
         return new ResponseEntity<>(new ResponseDto(
-                new HeaderDto(ERROR, HttpStatus.NOT_FOUND.value(), message),
-                null
-        ), HttpStatus.OK
+                new Data(message)), HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ResponseDto> sQLIntegrityConstraintViolationExceptionHandler(SQLIntegrityConstraintViolationException e){
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ResponseDto(
+                new Data(message)), HttpStatus.UNPROCESSABLE_ENTITY
         );
     }
 }

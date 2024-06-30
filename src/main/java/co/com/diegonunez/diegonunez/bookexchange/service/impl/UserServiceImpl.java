@@ -5,6 +5,7 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.User;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IUserRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IUserService;
 import co.com.diegonunez.diegonunez.bookexchange.util.Role;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -47,9 +49,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.USER);
-        return userRepository.save(user);
+    public User register(@Valid User user) throws SQLIntegrityConstraintViolationException {
+        //Realizar la validación para cuando el usuario ya está registrado (user_name) SQLIntegrityConstraintViolationException
+        String userName = user.getUsername();
+        if( userName == null){
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRole(Role.USER);
+            return userRepository.save(user);
+        }
+        throw new SQLIntegrityConstraintViolationException("The user name already exist");
     }
 }

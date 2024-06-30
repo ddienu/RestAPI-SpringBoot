@@ -2,8 +2,7 @@ package co.com.diegonunez.diegonunez.bookexchange.controller.impl;
 
 import co.com.diegonunez.diegonunez.bookexchange.controller.IBookController;
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
-import co.com.diegonunez.diegonunez.bookexchange.dto.BodyResponseDto;
-import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.exception.DuplicateISBNException;
 import co.com.diegonunez.diegonunez.bookexchange.exception.InvalidISBNException;
@@ -34,8 +33,7 @@ public class BookControllerImpl implements IBookController {
             List<Book> books = bookService.getAllBooks();
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books founded"),
-                            new BodyResponseDto(books)
+                            new Data("Books founded", books)
                     ), HttpStatus.OK
             );
     }
@@ -45,8 +43,7 @@ public class BookControllerImpl implements IBookController {
             Book book = bookService.findBooksByName(bookName);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book with name "+bookName+" founded"),
-                                new BodyResponseDto(book)
+                                new Data("Book with name "+bookName+" founded", book)
                         ), HttpStatus.OK);
             }
     @GetMapping(path = "/author/{bookAuthor}", produces = "application/json")
@@ -55,8 +52,7 @@ public class BookControllerImpl implements IBookController {
             List<Book> booksByAuthor = bookService.getBooksByAuthor(bookAuthor);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books by author "+bookAuthor+" founded."),
-                                new BodyResponseDto(booksByAuthor)
+                                new Data("Books by author "+bookAuthor+" founded.", booksByAuthor)
                         ), HttpStatus.OK);
     }
     @GetMapping(path = "/genre/{bookGenre}", produces = "application/json")
@@ -65,8 +61,7 @@ public class BookControllerImpl implements IBookController {
             List<Book> booksByGenre = bookService.getBooksByGenre(bookGenre);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Books by genre "+bookGenre+" founded"),
-                                new BodyResponseDto(booksByGenre)
+                                new Data("Books by genre "+bookGenre+" founded", booksByGenre)
                         ), HttpStatus.OK
                 );
         }
@@ -76,8 +71,7 @@ public class BookControllerImpl implements IBookController {
             Book bookByISBN = bookService.getBookByISBN(isbn);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book with ISBN:"+isbn+", founded"),
-                                new BodyResponseDto(bookByISBN)
+                                new Data("Book with ISBN:"+isbn+", founded", bookByISBN)
                         ), HttpStatus.OK
                 );
             }
@@ -87,8 +81,7 @@ public class BookControllerImpl implements IBookController {
             Book bookCreated = bookService.createBook(book);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new HeaderDto(SUCCESS, HttpStatus.CREATED.value(), "Book created successfully"),
-                                new BodyResponseDto(bookCreated)
+                                new Data("Book created successfully", bookCreated)
                         ), HttpStatus.CREATED
                 );
         }
@@ -98,8 +91,7 @@ public class BookControllerImpl implements IBookController {
         Book bookUpdated = bookService.updateBook(isbn, bookToUpdate);
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book updated successfully"),
-                            new BodyResponseDto(bookUpdated)
+                            new Data("Book updated successfully", bookUpdated)
                     ), HttpStatus.OK
             );
         }
@@ -108,8 +100,7 @@ public class BookControllerImpl implements IBookController {
     public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws NoBookFoundException, InvalidISBNException {
             bookService.deleteBookByISBN(isbn);
                 return new ResponseEntity<>(new ResponseDto(
-                        new HeaderDto(SUCCESS, HttpStatus.OK.value(), "Book deleted successfully"),
-                        null
+                        new Data("Book deleted successfully")
                 ), HttpStatus.OK
                 );
     }

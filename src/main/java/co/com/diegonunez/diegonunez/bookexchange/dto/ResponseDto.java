@@ -15,11 +15,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ResponseDto implements Serializable {
 
-    @JsonProperty("HeaderResponse")
-    private HeaderDto headerDto;
-    @JsonProperty("BodyResponse")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private BodyResponseDto bodyResponseDto;
-
-
+    @JsonProperty("data")
+    private Data data;
 }
