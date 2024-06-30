@@ -6,9 +6,11 @@ import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -147,7 +149,7 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
 
         return new ResponseEntity<>(new ResponseDto(
-                new Data(message)), HttpStatus.NOT_FOUND
+                new Data(message)), HttpStatus.UNAUTHORIZED
         );
     }
 
@@ -157,6 +159,21 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new ResponseDto(
                 new Data(message)), HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ResponseDto> badCredentialsExceptionHandler(BadCredentialsException e){
+        return new ResponseEntity<>(new ResponseDto(
+                new Data("Incorrect username or password. Please check your credentials.")), HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResponseDto> illegalArgumentExceptionHandler(IllegalArgumentException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(new ResponseDto(
+                new Data(message)), HttpStatus.BAD_REQUEST
         );
     }
 }

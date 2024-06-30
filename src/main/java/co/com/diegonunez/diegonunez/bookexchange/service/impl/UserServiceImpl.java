@@ -8,6 +8,7 @@ import co.com.diegonunez.diegonunez.bookexchange.util.Role;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,17 +35,20 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String login(UserDto user) throws AuthenticationException {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+    public String login(UserDto user) throws AuthenticationException, BadCredentialsException {
+        String message = "Incorrect username or password. Please check your credentials.";
         UserDetails userFound = userRepository.getUserByUsername(user.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(message));
 
         String passwordEncrypted = userFound.getPassword();
 
         boolean passwordMatch = passwordEncoder.matches(user.getPassword(), passwordEncrypted);
         if(!passwordMatch){
-            throw new AuthenticationException("Incorrect password");
+            throw new AuthenticationException(message);
         }
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+
         return jwtService.getToken(userFound);
     }
 
