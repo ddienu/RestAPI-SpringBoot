@@ -33,7 +33,10 @@ public class BookControllerImpl implements IBookController {
             List<Book> books = bookService.getAllBooks();
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new Data("Books founded", books)
+                            Data.builder()
+                                    .message("Books founded")
+                                    .books(books)
+                                    .build()
                     ), HttpStatus.OK
             );
     }

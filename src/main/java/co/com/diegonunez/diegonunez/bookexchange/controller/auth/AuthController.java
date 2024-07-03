@@ -5,6 +5,7 @@ import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import co.com.diegonunez.diegonunez.bookexchange.dto.UserDto;
 import co.com.diegonunez.diegonunez.bookexchange.entity.User;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/register")
-    public ResponseEntity<ResponseDto> register(@RequestBody User user) throws SQLIntegrityConstraintViolationException {
+    public ResponseEntity<ResponseDto> register(@Valid @RequestBody User user) throws SQLIntegrityConstraintViolationException {
         userService.register(user);
         return new ResponseEntity<>(
                 new ResponseDto(

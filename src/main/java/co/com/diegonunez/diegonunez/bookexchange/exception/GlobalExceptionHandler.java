@@ -2,25 +2,19 @@ package co.com.diegonunez.diegonunez.bookexchange.exception;
 
 import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
-import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.naming.AuthenticationException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.ERROR;
 import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.SUCCESS;
@@ -30,15 +24,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseDto> handleValidationException(MethodArgumentNotValidException e) {
-
-        List<String> errors = new ArrayList<>();
-        for (ObjectError message : e.getAllErrors()) {
-            errors.add(message.getDefaultMessage());
-        }
-
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new Data(errors.toString())
+                        Data.builder()
+                                .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
+                                .build()
                 ), HttpStatus.BAD_REQUEST
         );
     }

@@ -3,10 +3,7 @@ package co.com.diegonunez.diegonunez.bookexchange.dto;
 import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Data implements Serializable {
     @JsonProperty("message")
     private String message;

@@ -2,10 +2,12 @@ package co.com.diegonunez.diegonunez.bookexchange.entity;
 
 import co.com.diegonunez.diegonunez.bookexchange.util.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,8 +31,10 @@ public class User implements Serializable, UserDetails {
     @Column(name = "email")
     private String email;
     @Column(name = "password")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).+$", message = "The password must contain at least one capital letter, one number, and one special character.")
     private String password;
     @Column(name = "user_name")
+    @Length(min = 8, message = "The username must contain at least 8 characters")
     private String username;
     @Enumerated(EnumType.STRING)
     private Role role;

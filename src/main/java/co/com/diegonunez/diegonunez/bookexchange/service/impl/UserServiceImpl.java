@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -55,12 +56,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User register(@Valid User user) throws SQLIntegrityConstraintViolationException {
         //Realizar la validación para cuando el usuario ya está registrado (user_name) SQLIntegrityConstraintViolationException
-        String userName = user.getUsername();
-        if( userName == null){
+        Optional<User> userName = userRepository.getUserByUsername(user.getUsername());
+        if( !userName.isPresent()){
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole(Role.USER);
             return userRepository.save(user);
         }
-        throw new SQLIntegrityConstraintViolationException("The user name already exist");
+        throw new SQLIntegrityConstraintViolationException("The username already exist");
     }
 }
