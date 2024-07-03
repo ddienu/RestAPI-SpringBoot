@@ -176,6 +176,20 @@ public class GlobalExceptionHandler {
                 new Data(message)), HttpStatus.BAD_REQUEST
         );
     }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ResponseDto> signatureExceptionHandler(SignatureException e){
+        return new ResponseEntity<>(new ResponseDto(
+                new Data("Invalid token")), HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ResponseDto> expiredJwtExceptionHandler(ExpiredJwtException e){
+        return new ResponseEntity<>(new ResponseDto(
+                new Data("Token expired")), HttpStatus.UNAUTHORIZED
+        );
+    }
 }
 
 
