@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Optional;
 
@@ -36,18 +35,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String login(UserDto user) throws AuthenticationException, BadCredentialsException {
+    public String login(UserDto user) throws BadCredentialsException {
         String message = "Incorrect username or password. Please check your credentials.";
         UserDetails userFound = userRepository.getUserByUsername(user.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(message));
+                .orElseThrow(() -> new BadCredentialsException(message));
 
         String passwordEncrypted = userFound.getPassword();
 
         boolean passwordMatch = passwordEncoder.matches(user.getPassword(), passwordEncrypted);
         if(!passwordMatch){
-            throw new AuthenticationException(message);
+            throw new BadCredentialsException(message);
         }
-
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
         return jwtService.getToken(userFound);

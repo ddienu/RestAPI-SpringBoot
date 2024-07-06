@@ -9,9 +9,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
@@ -27,11 +27,14 @@ public class AuthController {
     }
 
     @PostMapping( path = "/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody UserDto user) throws AuthenticationException {
+    public ResponseEntity<ResponseDto> login(@RequestBody UserDto user) throws BadCredentialsException {
         String token = userService.login(user);
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new Data("User login successfully", token)
+                        Data.builder()
+                                .message("User login successfully")
+                                .token(token)
+                                .build()
                 ), HttpStatus.OK
         );
     }
@@ -41,7 +44,9 @@ public class AuthController {
         userService.register(user);
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new Data("User registered succesfully")
+                        Data.builder()
+                                .message("User registered successfully")
+                                .build()
                 ), HttpStatus.CREATED
         );
     }

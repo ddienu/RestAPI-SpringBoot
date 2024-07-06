@@ -8,6 +8,6 @@ import javax.naming.AuthenticationException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public interface IUserService {
-    String login(UserDto user) throws AuthenticationException, BadCredentialsException;
+    String login(UserDto user) throws BadCredentialsException;
     User register(User user) throws SQLIntegrityConstraintViolationException;
 }

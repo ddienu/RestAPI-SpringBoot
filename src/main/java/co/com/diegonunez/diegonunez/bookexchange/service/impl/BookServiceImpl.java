@@ -9,7 +9,11 @@ import co.com.diegonunez.diegonunez.bookexchange.service.IBookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
+
+import static co.com.diegonunez.diegonunez.bookexchange.util.ISBNValidator.validateIsbn;
+
 @Service
 public class BookServiceImpl implements IBookService {
 
@@ -70,47 +74,35 @@ public class BookServiceImpl implements IBookService {
                 throw new DuplicateISBNException("The ISBN already exist");
     }
     @Override
-    public Book updateBook(String isbn, Book bookToUpdate) throws NoBookFoundException {
+    public Book updateBook(String isbn, Book bookToUpdate) throws NoBookFoundException, InvalidPropertiesFormatException {
             Book bookExist = bookRepository.getBookByBookISBN(isbn);
             if(bookExist != null){
                 if( !bookExist.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
                     bookExist.setBookAuthor(bookToUpdate.getBookAuthor());
-                }
-                if( !bookExist.getBookCondition().equalsIgnoreCase(bookToUpdate.getBookCondition()) && bookToUpdate.getBookCondition() != null){
+                }else if( !bookExist.getBookCondition().equalsIgnoreCase(bookToUpdate.getBookCondition()) && bookToUpdate.getBookCondition() != null){
                     bookExist.setBookCondition(bookToUpdate.getBookCondition());
-                }
-                if( !bookExist.getBookDescription().equalsIgnoreCase(bookToUpdate.getBookDescription()) && bookToUpdate.getBookDescription() != null){
+                }else if( !bookExist.getBookDescription().equalsIgnoreCase(bookToUpdate.getBookDescription()) && bookToUpdate.getBookDescription() != null){
                     bookExist.setBookDescription(bookToUpdate.getBookDescription());
-                }
-                if( !bookExist.getBookGenre().equalsIgnoreCase(bookToUpdate.getBookGenre()) && bookToUpdate.getBookGenre() != null){
+                }else if( !bookExist.getBookGenre().equalsIgnoreCase(bookToUpdate.getBookGenre()) && bookToUpdate.getBookGenre() != null){
                     bookExist.setBookGenre(bookToUpdate.getBookGenre());
-                }
-                if( !bookExist.getBookImage().equalsIgnoreCase(bookToUpdate.getBookImage()) && bookToUpdate.getBookImage() != null){
+                }else if( !bookExist.getBookImage().equalsIgnoreCase(bookToUpdate.getBookImage()) && bookToUpdate.getBookImage() != null){
                     bookExist.setBookImage(bookToUpdate.getBookImage());
-                }
-                if( !bookExist.getBookISBN().equalsIgnoreCase(bookToUpdate.getBookISBN()) && bookToUpdate.getBookISBN() != null){
+                }else if( !bookExist.getBookISBN().equalsIgnoreCase(bookToUpdate.getBookISBN()) && bookToUpdate.getBookISBN() != null){
                     bookExist.setBookISBN(bookToUpdate.getBookISBN());
-                }
-                if( !bookExist.getBookName().equalsIgnoreCase(bookToUpdate.getBookName()) && bookToUpdate.getBookName() != null){
+                }else if( !bookExist.getBookName().equalsIgnoreCase(bookToUpdate.getBookName()) && bookToUpdate.getBookName() != null){
                     bookExist.setBookName(bookToUpdate.getBookName());
-                }
-                if( !bookExist.getIsAvailable().equals(bookToUpdate.getIsAvailable()) && bookToUpdate.getIsAvailable() != null){
+                }else if( !bookExist.getIsAvailable().equals(bookToUpdate.getIsAvailable()) && bookToUpdate.getIsAvailable() != null){
                     bookExist.setIsAvailable(bookToUpdate.getIsAvailable());
-                }
-                if( !bookExist.getBookAuthor().equalsIgnoreCase(bookToUpdate.getBookAuthor()) && bookToUpdate.getBookAuthor() != null){
-                    bookExist.setBookAuthor(bookToUpdate.getBookAuthor());
-                }
-                if( !bookExist.getBookLanguage().equalsIgnoreCase(bookToUpdate.getBookLanguage()) && bookToUpdate.getBookLanguage() != null){
+                }else if( !bookExist.getBookLanguage().equalsIgnoreCase(bookToUpdate.getBookLanguage()) && bookToUpdate.getBookLanguage() != null){
                     bookExist.setBookLanguage(bookToUpdate.getBookLanguage());
-                }
-                if( !bookExist.getUserId().equalsIgnoreCase(bookToUpdate.getUserId()) && bookToUpdate.getUserId() != null){
+                }else if( !bookExist.getUserId().equalsIgnoreCase(bookToUpdate.getUserId()) && bookToUpdate.getUserId() != null){
                     bookExist.setUserId(bookToUpdate.getUserId());
-                }
-                if( !bookExist.getBookRelease().equalsIgnoreCase(bookToUpdate.getBookRelease()) && bookToUpdate.getBookRelease() != null){
+                }else if( !bookExist.getBookRelease().equalsIgnoreCase(bookToUpdate.getBookRelease()) && bookToUpdate.getBookRelease() != null){
                     bookExist.setBookRelease(bookToUpdate.getBookRelease());
-                }
-                if( !bookExist.getBookPublisher().equalsIgnoreCase(bookToUpdate.getBookPublisher()) && bookToUpdate.getBookPublisher() != null) {
+                }else if( !bookExist.getBookPublisher().equalsIgnoreCase(bookToUpdate.getBookPublisher()) && bookToUpdate.getBookPublisher() != null) {
                     bookExist.setBookPublisher(bookToUpdate.getBookPublisher());
+                }else{
+                    throw new InvalidPropertiesFormatException("Empty request body or invalid fields");
                 }
                 return bookRepository.save(bookExist);
             }
@@ -124,11 +116,5 @@ public class BookServiceImpl implements IBookService {
                throw new NoBookFoundException("No book found");
            }
            bookRepository.deleteBookByBookISBN(isbn);
-    }
-    @Override
-    public void validateIsbn(String isbn) throws InvalidISBNException {
-        if( isbn.length() != 13 && isbn.length() != 10 ){
-            throw new InvalidISBNException("The ISBN must contain 10 or 13 numbers");
-        }
     }
 }

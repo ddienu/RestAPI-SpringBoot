@@ -5,6 +5,7 @@ import co.com.diegonunez.diegonunez.bookexchange.exception.DuplicateISBNExceptio
 import co.com.diegonunez.diegonunez.bookexchange.exception.InvalidISBNException;
 import co.com.diegonunez.diegonunez.bookexchange.exception.NoBookFoundException;
 
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 
 public interface IBookService {
@@ -14,7 +15,6 @@ public interface IBookService {
     List<Book> getBooksByAuthor(String bookAuthor) throws NoBookFoundException;
     List<Book> getBooksByGenre(String bookGenre) throws NoBookFoundException;
     Book createBook(Book book) throws DuplicateISBNException;
-    Book updateBook(String isbn, Book book) throws NoBookFoundException;
+    Book updateBook(String isbn, Book book) throws NoBookFoundException, InvalidPropertiesFormatException;
     void deleteBookByISBN(String isbn) throws NoBookFoundException, InvalidISBNException;
-    void validateIsbn(String isbn) throws InvalidISBNException;
 }

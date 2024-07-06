@@ -14,9 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
-
-import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.SUCCESS;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "/v1/book")
@@ -46,7 +45,10 @@ public class BookControllerImpl implements IBookController {
             Book book = bookService.findBooksByName(bookName);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new Data("Book with name "+bookName+" founded", book)
+                                Data.builder()
+                                        .message("Book with name "+bookName+" founded")
+                                        .book(book)
+                                        .build()
                         ), HttpStatus.OK);
             }
     @GetMapping(path = "/author/{bookAuthor}", produces = "application/json")
@@ -55,7 +57,10 @@ public class BookControllerImpl implements IBookController {
             List<Book> booksByAuthor = bookService.getBooksByAuthor(bookAuthor);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new Data("Books by author "+bookAuthor+" founded.", booksByAuthor)
+                                Data.builder()
+                                        .message("Books by author "+bookAuthor+" founded.")
+                                        .books(booksByAuthor)
+                                        .build()
                         ), HttpStatus.OK);
     }
     @GetMapping(path = "/genre/{bookGenre}", produces = "application/json")
@@ -64,7 +69,10 @@ public class BookControllerImpl implements IBookController {
             List<Book> booksByGenre = bookService.getBooksByGenre(bookGenre);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new Data("Books by genre "+bookGenre+" founded", booksByGenre)
+                                Data.builder()
+                                        .message("Books by genre "+bookGenre+" founded")
+                                        .books(booksByGenre)
+                                        .build()
                         ), HttpStatus.OK
                 );
         }
@@ -74,7 +82,10 @@ public class BookControllerImpl implements IBookController {
             Book bookByISBN = bookService.getBookByISBN(isbn);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new Data("Book with ISBN:"+isbn+", founded", bookByISBN)
+                                Data.builder()
+                                        .message("Book with ISBN:"+isbn+", founded")
+                                        .book(bookByISBN)
+                                        .build()
                         ), HttpStatus.OK
                 );
             }
@@ -84,17 +95,23 @@ public class BookControllerImpl implements IBookController {
             Book bookCreated = bookService.createBook(book);
                 return new ResponseEntity<>(
                         new ResponseDto(
-                                new Data("Book created successfully", bookCreated)
+                                Data.builder()
+                                        .message("Book created successfully")
+                                        .book(bookCreated)
+                                        .build()
                         ), HttpStatus.CREATED
                 );
         }
     @PutMapping(path = "/{isbn}", produces = "application/json")
     @Override
-    public ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws NoBookFoundException {
+    public ResponseEntity<ResponseDto> updateBook(@PathVariable String isbn, @RequestBody Book bookToUpdate) throws NoBookFoundException, InvalidPropertiesFormatException {
         Book bookUpdated = bookService.updateBook(isbn, bookToUpdate);
             return new ResponseEntity<>(
                     new ResponseDto(
-                            new Data("Book updated successfully", bookUpdated)
+                            Data.builder()
+                                    .message("Book updated successfully")
+                                    .book(bookUpdated)
+                                    .build()
                     ), HttpStatus.OK
             );
         }
@@ -103,7 +120,9 @@ public class BookControllerImpl implements IBookController {
     public ResponseEntity<ResponseDto> deleteBookByISBN(@PathVariable String isbn) throws NoBookFoundException, InvalidISBNException {
             bookService.deleteBookByISBN(isbn);
                 return new ResponseEntity<>(new ResponseDto(
-                        new Data("Book deleted successfully")
+                        Data.builder()
+                                .message("Book deleted successfully")
+                                .build()
                 ), HttpStatus.OK
                 );
     }
