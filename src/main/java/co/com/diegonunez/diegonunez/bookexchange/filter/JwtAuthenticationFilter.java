@@ -1,5 +1,6 @@
 package co.com.diegonunez.diegonunez.bookexchange.filter;
 
+import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.JwtServiceImpl;
 import com.mysql.cj.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -36,12 +39,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+            final String path = request.getServletPath();
+
+            if( "/api/auth/login".equals(path) || "/api/auth/register".equals(path)){
+                filterChain.doFilter(request, response);
+                return;
+            }
             final String token = getTokenFromRequest(request);
             final String username;
 
             try{
                 if( token == null ){
-                    filterChain.doFilter(request, response);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    //This message is shown when the Bearer Token is null
+                    response.getWriter().write("{ \"data\": { \"message\": \"Unauthorized Access\" } }");
                     return;
                 }
                    username = jwtService.getUsernameFromToken(token);

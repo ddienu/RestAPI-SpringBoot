@@ -3,19 +3,22 @@ package co.com.diegonunez.diegonunez.bookexchange.exception;
 import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.InvalidPropertiesFormatException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler{
     //Exception that validates the entity in the request body.
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseDto> handleValidationException(MethodArgumentNotValidException e) {
@@ -145,7 +148,28 @@ public class GlobalExceptionHandler {
                         .build()
         ), HttpStatus.BAD_REQUEST
         );
+    }
+    //Tnis exception is thrown when jwt is null or empty.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseDto> accessDeniedExceptionHandler(AccessDeniedException e){
+        return new ResponseEntity<>(new ResponseDto(
+                Data.builder()
+                        .message(e.getMessage())
+                        .build()
+        ), HttpStatus.UNAUTHORIZED
+        );
+    }
 
+    //This exception is thrown when the jwt is malformed.
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<ResponseDto> malformedJwtExceptionHandler(MalformedJwtException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Invalid token")
+                                .build()
+                ), HttpStatus.BAD_REQUEST
+        );
     }
 }
 
