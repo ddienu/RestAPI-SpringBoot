@@ -57,7 +57,7 @@ public class JwtServiceImpl implements IJwtService {
 
     public String getUsernameFromToken(String token) {
 
-        return getClaim(token, Claims::getSubject);
+        return getAllClaims(token).get("username", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
