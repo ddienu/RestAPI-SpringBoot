@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,5 +24,5 @@ public class UserFavoriteBooks implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "book_isbn")
-    private String bookISBN;
+    private List<String> bookISBN;
 }

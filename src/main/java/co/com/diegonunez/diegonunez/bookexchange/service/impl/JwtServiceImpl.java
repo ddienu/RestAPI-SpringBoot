@@ -1,18 +1,23 @@
 package co.com.diegonunez.diegonunez.bookexchange.service.impl;
 
+import co.com.diegonunez.diegonunez.bookexchange.entity.User;
+import co.com.diegonunez.diegonunez.bookexchange.repository.IUserRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IJwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -20,16 +25,25 @@ public class JwtServiceImpl implements IJwtService {
 
     private static final String SECRET_KEY = "nZ3qzQ5CvU/T4wB3KZLlv0tKhG8G/Jzq6D1G/ojjZCQ=";
 
+    private final IUserRepository userRepository;
+    @Autowired
+    public JwtServiceImpl(IUserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+
     @Override
     public String getToken(UserDetails user) {
         return getToken(new HashMap<>(), user);
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
+        User userFounded = userRepository.getUserByUsername(user.getUsername()).orElseThrow(() ->
+                new UsernameNotFoundException("User not found"));
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(user.getUsername())
+                .setSubject(userFounded.getId().toString())
+                .claim("username", user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*10))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
