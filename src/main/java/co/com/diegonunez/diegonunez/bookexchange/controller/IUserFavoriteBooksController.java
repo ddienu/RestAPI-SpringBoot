@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface IUserFavoriteBooksController {
     ResponseEntity<ResponseDto> getUserFavoriteBooks(@RequestHeader("Authorization") String token);
-    void addFavoriteBooks(@RequestHeader("Authorization") String token, @RequestBody List<String> bookISBNs);
+    void addFavoriteBooks(@RequestHeader("Authorization") String token, @RequestBody String bookISBN);
 
 }

@@ -7,6 +7,6 @@ import java.util.List;
 public interface IUserFavoriteBooksService {
 
     List<Book> getUserFavoriteBooks(Integer userId);
-    void addFavoriteBooks (Integer userId, List<String> bookISBNs);
-    void deleteFavoriteBooks (Integer userId, List<String> bookISBNs);
+    void addFavoriteBooks (Integer userId, String bookISBN);
+    void deleteFavoriteBooks (Integer userId, String bookISBN);
 }

@@ -9,5 +9,5 @@ import java.util.List;
 public interface IUserFavoriteBooksRepository extends JpaRepository<UserFavoriteBooks, Integer> {
 
     List<UserFavoriteBooks> findBooksByUserId(Integer userId);
-    void deleteByUserIdAndBookISBN(Integer userId, List<String> bookISBN);
+    void deleteByUserIdAndBookISBN(Integer userId, String bookISBN);
 }

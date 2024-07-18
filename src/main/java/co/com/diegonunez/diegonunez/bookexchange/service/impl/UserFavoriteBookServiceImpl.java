@@ -29,10 +29,10 @@ public class UserFavoriteBookServiceImpl implements IUserFavoriteBooksService {
     }
 
     @Override
-    public void addFavoriteBooks(Integer userId, List<String> bookISBNs){
+    public void addFavoriteBooks(Integer userId, String bookISBN){
     }
 
     @Override
-    public void deleteFavoriteBooks(Integer userId, List<String> bookISBNs) {
+    public void deleteFavoriteBooks(Integer userId, String bookISBN) {
     }
 }

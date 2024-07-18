@@ -43,7 +43,7 @@ public class UserFavoriteBooksControllerImpl implements IUserFavoriteBooksContro
     }
 
     @Override
-    public void addFavoriteBooks(String token, List<String> bookISBNs) {
+    public void addFavoriteBooks(String token, String  bookISBNs) {
 
     }
 

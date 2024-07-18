@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter
 @Setter
@@ -21,8 +20,7 @@ public class UserFavoriteBooks implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "related_user_id")
     private User user;
-    @Column(name = "book_isbn")
-    private List<String> bookISBN;
+    private String bookISBN;
 }
