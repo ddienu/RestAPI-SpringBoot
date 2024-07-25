@@ -9,6 +9,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements IJwtService {
 
-    private static final String SECRET_KEY = "nZ3qzQ5CvU/T4wB3KZLlv0tKhG8G/Jzq6D1G/ojjZCQ=";
+    @Value("${SECRET_KEY}")
+    private String SECRET_KEY;
 
     private final IUserRepository userRepository;
     @Autowired

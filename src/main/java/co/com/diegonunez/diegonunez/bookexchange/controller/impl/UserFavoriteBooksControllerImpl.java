@@ -7,7 +7,7 @@ import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.service.impl.UserFavoriteBookServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +22,8 @@ import java.util.List;
 public class UserFavoriteBooksControllerImpl implements IUserFavoriteBooksController {
 
     private final UserFavoriteBookServiceImpl userFavoriteBookService;
+    @Value("${SECRET_KEY}")
+    private String SECRET_KEY;
 
     public UserFavoriteBooksControllerImpl(UserFavoriteBookServiceImpl userFavoriteBooksService){
         this.userFavoriteBookService = userFavoriteBooksService;
@@ -54,7 +56,7 @@ public class UserFavoriteBooksControllerImpl implements IUserFavoriteBooksContro
         }
 
         Claims claims = Jwts.parser()
-                .setSigningKey("nZ3qzQ5CvU/T4wB3KZLlv0tKhG8G/Jzq6D1G/ojjZCQ=")
+                .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
         return Integer.parseInt(claims.getSubject());
