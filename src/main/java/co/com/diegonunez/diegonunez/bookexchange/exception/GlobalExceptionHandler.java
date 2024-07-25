@@ -1,158 +1,174 @@
 package co.com.diegonunez.diegonunez.bookexchange.exception;
 
-import co.com.diegonunez.diegonunez.bookexchange.dto.HeaderDto;
+import co.com.diegonunez.diegonunez.bookexchange.dto.Data;
 import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
-import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
-import org.springframework.dao.DuplicateKeyException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.ObjectError;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.naming.AuthenticationException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.ERROR;
-import static co.com.diegonunez.diegonunez.bookexchange.util.Constants.SUCCESS;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.InvalidPropertiesFormatException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-
+public class GlobalExceptionHandler{
+    //Exception that validates the entity in the request body.
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseDto> handleValidationException(MethodArgumentNotValidException e) {
-
-        List<String> errors = new ArrayList<>();
-        for (ObjectError message : e.getAllErrors()) {
-            errors.add(message.getDefaultMessage());
-        }
-
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), errors.toString()),
-                        null
+                        Data.builder()
+                                .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
+                                .build()
                 ), HttpStatus.BAD_REQUEST
         );
     }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ResponseDto> handleEntityNotFoundException(EntityNotFoundException e) {
+    //Exception that validates when a book cannot be founded in the database.
+    @ExceptionHandler(NoBookFoundException.class)
+    public ResponseEntity<ResponseDto> noBookFoundExceptionHandler(NoBookFoundException e) {
         String message = e.getMessage();
 
-        if (message.equalsIgnoreCase("No books founded")) {
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                            null), HttpStatus.OK
-            );
-        } else if (message.contains("No book with name")) {
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
-        } else if (message.contains("Book with ISBN")) {
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message),
-                            null
-                    ), HttpStatus.OK
-            );
-        }else if( message.contains("No books by author")){
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message ),
-                            null
-                    ), HttpStatus.OK
-            );
-        }else if( message.contains("Books by genre")){
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(SUCCESS, HttpStatus.NO_CONTENT.value(), message),
-                            null
-                    ), HttpStatus.OK
-            );
-        }else if( message.contains("No book found")){
-            return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
-            );
-        }else if( message.contains("No book founded to update with ISBN")){
-            return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
-            );
-        }else if( message.contains("El usuario no ha sido registrado")){
-            return new ResponseEntity<>(new ResponseDto(
-                    new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), message),
-                    null
-            ), HttpStatus.OK
-            );
-        }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
-        );
+                        Data.builder()
+                                .message(message)
+                                .build()
+                ), HttpStatus.OK);
     }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ResponseDto> badRequestExceptionHandler(BadRequestException e){
+    //Exception that is thrown when a ISBN length is different of 10 or 13.
+    @ExceptionHandler(InvalidISBNException.class)
+    public ResponseEntity<ResponseDto> invalidISBNExceptionHandler(InvalidISBNException e){
         String message = e.getMessage();
 
-        if( message.contains("The ISBN must contain 10 or 13 numbers")){
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
-        );
-    }
+                        Data.builder()
+                                .message(message)
+                                .build()
+                ), HttpStatus.BAD_REQUEST);
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<ResponseDto> duplicateKeyExceptionHandler(DuplicateKeyException e){
+
+    }
+    //Exception is thrown when the user wants to upload a new book but the ISBN already exist in the database
+    @ExceptionHandler(DuplicateISBNException.class)
+    public ResponseEntity<ResponseDto> duplicateKeyExceptionHandler(DuplicateISBNException e){
         String message = e.getMessage();
 
-        if(message.contains("The ISBN already exist")){
-            return new ResponseEntity<>(
-                    new ResponseDto(
-                            new HeaderDto(ERROR, HttpStatus.BAD_REQUEST.value(), message),
-                            null), HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto(ERROR, HttpStatus.NO_CONTENT.value(), e.getMessage()),
-                        null), HttpStatus.NO_CONTENT
-        );
+                        Data.builder()
+                                .message(message)
+                                .build()
+                ), HttpStatus.BAD_REQUEST);
     }
+    //This exception is thrown when the body of the request is empty
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ResponseDto> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException e){
         String message = e.getMessage();
         String [] parts = message.split(":");
         return new ResponseEntity<>(
                 new ResponseDto(
-                        new HeaderDto("Error", HttpStatus.BAD_REQUEST.value(), parts[0]),
-                        null), HttpStatus.BAD_REQUEST
+                        Data.builder()
+                                .message(parts[0])
+                                .build()
+                ), HttpStatus.BAD_REQUEST
+        );
+    }
+    //SQLIntegrityException is thrown when the username given from user already exist.
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ResponseDto> sQLIntegrityConstraintViolationExceptionHandler(SQLIntegrityConstraintViolationException e){
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message(message)
+                                .build()
+                ), HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+    //This exception is thrown when the user credentials are incorrect.
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ResponseDto> badCredentialsExceptionHandler(BadCredentialsException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Incorrect username or password. Please check your credentials.")
+                                .build()
+                ), HttpStatus.UNAUTHORIZED
+        );
+    }
+    //This exception is thrown when the jwt is invalid
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ResponseDto> signatureExceptionHandler(SignatureException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Invalid token")
+                                .build()
+                ), HttpStatus.UNAUTHORIZED
+        );
+    }
+    //This exception is thrown when the jwt expired
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ResponseDto> expiredJwtExceptionHandler(ExpiredJwtException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Token expired")
+                                .build()
+                ), HttpStatus.UNAUTHORIZED
+        );
+    }
+    //This exception is thrown when the request body is empty or the fields are invalid
+    @ExceptionHandler(InvalidPropertiesFormatException.class)
+    public ResponseEntity<ResponseDto> invalidPropertiesFormatExceptionHandler(InvalidPropertiesFormatException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(new ResponseDto(
+                Data.builder()
+                        .message(message)
+                        .build()
+        ), HttpStatus.BAD_REQUEST
+        );
+    }
+    //This exception is thrown when try to instantiate a Util class.
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<ResponseDto> unsupportedOperationExceptionHandler(UnsupportedOperationException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(new ResponseDto(
+                Data.builder()
+                        .message(message)
+                        .build()
+        ), HttpStatus.BAD_REQUEST
+        );
+    }
+    //Tnis exception is thrown when jwt is null or empty.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseDto> accessDeniedExceptionHandler(AccessDeniedException e){
+        return new ResponseEntity<>(new ResponseDto(
+                Data.builder()
+                        .message(e.getMessage())
+                        .build()
+        ), HttpStatus.UNAUTHORIZED
         );
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ResponseDto> authenticationExceptionHandler(AuthenticationException e){
-        String message = e.getMessage();
-
-        return new ResponseEntity<>(new ResponseDto(
-                new HeaderDto(ERROR, HttpStatus.UNAUTHORIZED.value(), message),
-                null
-        ), HttpStatus.OK
+    //This exception is thrown when the jwt is malformed.
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<ResponseDto> malformedJwtExceptionHandler(MalformedJwtException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Invalid token")
+                                .build()
+                ), HttpStatus.BAD_REQUEST
         );
     }
 }

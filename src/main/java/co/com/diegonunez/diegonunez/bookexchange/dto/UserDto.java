@@ -1,5 +1,6 @@
 package co.com.diegonunez.diegonunez.bookexchange.dto;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private String email;
+    private String username;
     private String password;
 }
