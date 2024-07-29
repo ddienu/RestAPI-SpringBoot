@@ -18,7 +18,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -89,4 +88,18 @@ public class JwtServiceImpl implements IJwtService {
     private boolean isTokenExpired(String token){
         return getExpirationDate(token).before(new Date());
     }
+
+    public Integer getUserIdFromToken(String token) {
+        //Erase the Bearer text from token.
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return Integer.parseInt(claims.getSubject());
+    }
+
 }

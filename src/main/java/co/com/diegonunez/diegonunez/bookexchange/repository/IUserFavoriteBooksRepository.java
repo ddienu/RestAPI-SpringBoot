@@ -1,5 +1,6 @@
 package co.com.diegonunez.diegonunez.bookexchange.repository;
 
+import co.com.diegonunez.diegonunez.bookexchange.entity.Book;
 import co.com.diegonunez.diegonunez.bookexchange.entity.UserFavoriteBooks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -9,5 +10,6 @@ import java.util.List;
 public interface IUserFavoriteBooksRepository extends JpaRepository<UserFavoriteBooks, Integer> {
 
     List<UserFavoriteBooks> findBooksByUserId(Integer userId);
-    void deleteByUserIdAndBookISBN(Integer userId, String bookISBN);
+    /*Book addBookISBNbyUserId(Integer userId, Book bookISBN);*/
+    void deleteByUserIdAndBookISBN(Integer userId, Book bookISBN);
 }

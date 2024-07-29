@@ -95,8 +95,6 @@ public class BookServiceImpl implements IBookService {
                     bookExist.setIsAvailable(bookToUpdate.getIsAvailable());
                 }else if( !bookExist.getBookLanguage().equalsIgnoreCase(bookToUpdate.getBookLanguage()) && bookToUpdate.getBookLanguage() != null){
                     bookExist.setBookLanguage(bookToUpdate.getBookLanguage());
-                }else if( !bookExist.getUserId().equalsIgnoreCase(bookToUpdate.getUserId()) && bookToUpdate.getUserId() != null){
-                    bookExist.setUserId(bookToUpdate.getUserId());
                 }else if( !bookExist.getBookRelease().equalsIgnoreCase(bookToUpdate.getBookRelease()) && bookToUpdate.getBookRelease() != null){
                     bookExist.setBookRelease(bookToUpdate.getBookRelease());
                 }else if( !bookExist.getBookPublisher().equalsIgnoreCase(bookToUpdate.getBookPublisher()) && bookToUpdate.getBookPublisher() != null) {

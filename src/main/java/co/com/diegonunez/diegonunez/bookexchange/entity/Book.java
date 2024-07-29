@@ -30,8 +30,6 @@ public class Book implements Serializable {
     private String bookAuthor;
     @Column(name = "is_available")
     private Boolean isAvailable;
-    @Column(name = "user_id")
-    private String userId;
     @Column(name = "book_release")
     private String bookRelease;
     @Column(name = "book_genre")
