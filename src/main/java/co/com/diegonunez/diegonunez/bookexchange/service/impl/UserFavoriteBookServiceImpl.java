@@ -7,6 +7,8 @@ import co.com.diegonunez.diegonunez.bookexchange.exception.NoBookFoundException;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IUserFavoriteBooksRepository;
 import co.com.diegonunez.diegonunez.bookexchange.repository.IUserRepository;
 import co.com.diegonunez.diegonunez.bookexchange.service.IUserFavoriteBooksService;
+import co.com.diegonunez.diegonunez.bookexchange.util.ISBNValidator;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +26,10 @@ public class UserFavoriteBookServiceImpl implements IUserFavoriteBooksService {
         this.bookService = bookService;
         this.userRepository = userRepository;
     }
+
+    //Method to get the user favorite books, throws a NoBookFoundException when the list is empty.
     @Override
-    public List<Book> getUserFavoriteBooks(Integer userId) {
+    public List<Book> getUserFavoriteBooks(Integer userId) throws NoBookFoundException{
         List<UserFavoriteBooks> userFavoriteBooks = favoriteBooksRepository.findBooksByUserId(userId);
         if( userFavoriteBooks.isEmpty()){
             throw new NoBookFoundException("No favorite books founded for this user");
@@ -35,16 +39,22 @@ public class UserFavoriteBookServiceImpl implements IUserFavoriteBooksService {
                 .toList();
     }
 
+    //Method to add new user favorite book, it permits the persistence into database, saving the userId and the book ISBN.
     @Override
     public void addFavoriteBooks(Integer userId, String bookISBN){
+        ISBNValidator.validateIsbn(bookISBN);
         User userFounded = userRepository.getReferenceById(userId);
-        UserFavoriteBooks newFavoriteBook1 = new UserFavoriteBooks();
-        newFavoriteBook1.setBookISBN(bookISBN);
-        newFavoriteBook1.setUser(userFounded);
-        favoriteBooksRepository.save(newFavoriteBook1);
+        UserFavoriteBooks favoriteBook = new UserFavoriteBooks();
+        favoriteBook.setBookISBN(bookISBN);
+        favoriteBook.setUser(userFounded);
+        favoriteBooksRepository.save(favoriteBook);
     }
 
+    //Method to erase a book from the user favorite book list it throws an exception if the list is empty.
     @Override
-    public void deleteFavoriteBooks(Integer userId, String bookISBN) {
+    @Transactional
+    public void deleteFavoriteBook(Integer userId, String bookISBN) {
+        ISBNValidator.validateIsbn(bookISBN);
+        favoriteBooksRepository.deleteByUserIdAndBookISBN(userId, bookISBN);
     }
 }

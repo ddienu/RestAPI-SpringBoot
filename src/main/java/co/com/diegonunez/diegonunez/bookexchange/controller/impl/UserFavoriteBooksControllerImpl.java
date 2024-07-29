@@ -43,7 +43,7 @@ public class UserFavoriteBooksControllerImpl implements IUserFavoriteBooksContro
                 );
     }
 
-    @PostMapping(path = "/{bookISBN}")
+    @PostMapping(path = "/add/{bookISBN}")
     @Override
     public ResponseEntity<ResponseDto> addFavoriteBooks(String token, @PathVariable String  bookISBN) {
         Integer userId = jwtService.getUserIdFromToken(token);
@@ -52,6 +52,20 @@ public class UserFavoriteBooksControllerImpl implements IUserFavoriteBooksContro
                 new ResponseDto(
                         Data.builder()
                                 .message("Book added to user favorite list")
+                                .build()
+                ), HttpStatus.OK
+        );
+    }
+
+    @DeleteMapping(path = "/remove/{bookISBN}")
+    @Override
+    public ResponseEntity<ResponseDto> eraseFavoriteBook(String token, @PathVariable String bookISBN) {
+        Integer userId = jwtService.getUserIdFromToken(token);
+        userFavoriteBookService.deleteFavoriteBook(userId, bookISBN);
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message("Book erased from the user favorite list")
                                 .build()
                 ), HttpStatus.OK
         );

@@ -1,6 +1,5 @@
 package co.com.diegonunez.diegonunez.bookexchange.dto;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
