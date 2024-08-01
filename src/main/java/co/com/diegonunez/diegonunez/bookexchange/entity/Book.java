@@ -28,6 +28,8 @@ public class Book implements Serializable {
     @Column(name = "book_author")
     @NotBlank(message = "The field book author cannot be empty")
     private String bookAuthor;
+    @Column(name = "current_user_id")
+    private Integer currentUserId;
     @Column(name = "is_available")
     private Boolean isAvailable;
     @Column(name = "book_release")

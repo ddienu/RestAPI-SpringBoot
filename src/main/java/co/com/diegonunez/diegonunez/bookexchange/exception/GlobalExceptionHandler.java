@@ -5,6 +5,8 @@ import co.com.diegonunez.diegonunez.bookexchange.dto.ResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jdk.jfr.Experimental;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -171,6 +173,19 @@ public class GlobalExceptionHandler{
                 ), HttpStatus.BAD_REQUEST
         );
     }
+
+    //This exception is thrown when user request a book and it's loaned already
+    @ExceptionHandler(BookLoanedException.class)
+    public ResponseEntity<ResponseDto> bookLoanedExceptionHandler(BookLoanedException e){
+        return new ResponseEntity<>(
+                new ResponseDto(
+                        Data.builder()
+                                .message(e.getMessage())
+                                .build()
+                ), HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
 }
+
 
 
