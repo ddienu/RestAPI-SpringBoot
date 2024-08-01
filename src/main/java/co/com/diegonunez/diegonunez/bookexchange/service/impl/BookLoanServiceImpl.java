@@ -45,27 +45,27 @@ public class BookLoanServiceImpl implements IBookLoanService {
     public void returnBook(Integer userId, String bookISBN) {
 
         //Variable to store the requested book by user
-        Book bookToLoan = bookRepository.getBookByBookISBN(bookISBN);
+        Book bookToReturn = bookRepository.getBookByBookISBN(bookISBN);
         //Conditional to know if the book exist in the database if it is null it throws a custom exception.
-        if( bookToLoan == null ){
+        if( bookToReturn == null ){
             //throws a NoBookFoundException with a custom message.
             throw new NoBookFoundException("No book found by ISBN " + bookISBN);
         }
         //Conditional to know if the book requested is in loan already.
-        if(Boolean.TRUE.equals(bookToLoan.getIsAvailable())){
+        if(Boolean.TRUE.equals(bookToReturn.getIsAvailable())){
             //If the book is in loan throws a BookLoanedException
             throw new BookLoanedException("The book requested is not on loan");
         }
         //Conditional to know if the user that wants to return a book is the same that register the loan.
-        if( !bookToLoan.getCurrentUserId().equals(userId) ){
+        if( !bookToReturn.getCurrentUserId().equals(userId) ){
             //If the condition is false then the application throws an exception with a custom message.
             throw new BookLoanedException("This user did not borrow the book ");
         }
         //Set the book status to true.
-        bookToLoan.setIsAvailable(true);
+        bookToReturn.setIsAvailable(true);
         //set the current user to null.
-        bookToLoan.setCurrentUserId(null);
+        bookToReturn.setCurrentUserId(null);
         //save the book in the database with updated parameters.
-        bookRepository.save(bookToLoan);
+        bookRepository.save(bookToReturn);
     }
 }
